@@ -1,0 +1,991 @@
+\documentclass[a4paper,9pt,twocolumn,twoside,printwatermark=true]{pinp}
+
+%% Some pieces required from the pandoc template
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Use the lineno option to display guide line numbers if required.
+% Note that the use of elements such as single-column equations
+% may affect the guide line number alignment.
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% The geometry package layout settings need to be set here...
+\geometry{layoutsize={0.95588\paperwidth,0.98864\paperheight},%
+          layouthoffset=0.02206\paperwidth,%
+		  layoutvoffset=0.00568\paperheight}
+
+\definecolor{pinpblue}{HTML}{185FAF}  % imagecolorpicker on blue for new R logo
+\definecolor{pnasbluetext}{RGB}{101,0,0} %
+
+
+
+\title{Women in Parliament -- data.table}
+
+\author[]{Saghir Bashir}
+
+
+\setcounter{secnumdepth}{3}
+
+% Please give the surname of the lead author for the running footer
+\leadauthor{\href{https://creativecommons.org/licenses/by-sa/4.0/}{CC BY SA}
+\href{https://ilustat.com/}{ilustat} \(\bullet\)
+\href{mailto:info@ilustat.com}{\nolinkurl{info@ilustat.com}}}
+
+% Keywords are not mandatory, but authors are strongly encouraged to provide them. If provided, please include two to five keywords, separated by the pipe symbol, e.g:
+ \keywords{  Women in Parliament |  World Bank Indicator |  data.table |  Tinyverse  }  
+
+\begin{abstract}
+We will use the World Bank's indicator data for ``Women in Parliament''
+as a case study when working with the data.table R package. We will
+guide you through the geographical and time trends for the percentage of
+women in national parliaments. We will start by learning about and
+understanding the raw data, which we will then process (``wrangle'') in
+preparation for some exploratory analysis.
+\end{abstract}
+
+\dates{This version was compiled on \today} 
+
+% initially we use doi so keep for backwards compatibility
+% new name is doi_footer
+\doifooter{Learn more at \url{https://ilustat.com/resources/}}
+
+\pinpfootercontents{Women in Parliament -- data.table}
+
+\begin{document}
+
+% Optional adjustment to line up main text (after abstract) of first page with line numbers, when using both lineno and twocolumn options.
+% You should only change this length when you've finalised the article contents.
+\verticaladjustment{-2pt}
+
+\maketitle
+\thispagestyle{firststyle}
+\ifthenelse{\boolean{shortarticle}}{\ifthenelse{\boolean{singlecolumn}}{\abscontentformatted}{\abscontent}}{}
+
+% If your first paragraph (i.e. with the \dropcap) contains a list environment (quote, quotation, theorem, definition, enumerate, itemize...), the line after the list may have some extra indentation. If this is the case, add \parshape=0 to the end of the list environment.
+
+
+\section{Preface}\label{preface}
+
+We present a real-life case study for the data.table1 package using the
+World Bank's ``Women in Parliament'' indicator data. To get the most out
+of this case-study guide, repeat the examples and do the exercises
+whilst reading it.
+
+\subsection{Guide materials}\label{guide-materials}
+
+You can download materials for this guide from this link:
+
+\begin{itemize}
+\tightlist
+\item
+  \url{https://ilustat.com/shared/WiP-rdatatable.zip}
+\end{itemize}
+
+Unzip the file, which contains the data, this guide and an R markdown
+exercise file. We advise you to work with WiP-Exercise.Rmd. If you are
+using RStudio, you can double click on WiP-dt.Rproj to get started.
+
+\section{Objectives}\label{objectives}
+
+\emph{Explore the geographical and time trends for the percentage of
+women\footnote{The objective could be termed neutrally as ``gender
+  trends'' but we will keep it per the World Bank data.} in national
+parliaments.}
+
+\section{Understanding the Data}\label{understanding-the-data}
+
+\subsection{The World Bank Data}\label{the-world-bank-data}
+
+The raw data for \emph{``Proportion of seats held by women in national
+parliaments''} includes the percentage of women in parliament
+(\emph{``single or lower parliamentary chambers only''}) by country
+(region) and year. It can be downloaded from:\footnote{The
+  \texttt{wbstats} R package
+  (\url{https://cran.r-project.org/web/packages/wbstats/}) gives access
+  to a ``tidier'' version of the World Bank indicator data.}
+
+\begin{itemize}
+\tightlist
+\item
+  \url{https://data.worldbank.org/indicator/SG.GEN.PARL.ZS}
+\end{itemize}
+
+As part of its ``open data'' mission the World Bank offers \emph{``free
+and open access to global development data''} kindly licensed under the
+``Creative Commons Attribution 4.0 (CC-BY 4.0)''.\footnote{\url{https://datacatalog.worldbank.org/public-licenses\#cc-by}.}
+
+\subsection{Source Data}\label{source-data}
+
+The data originates from the ``Inter-Parliamentary Union''
+(IPU)\footnote{Inter-Parliamentary Union: \url{https://www.ipu.org/}.}
+which provides an \emph{\emph{``Archive of statistical data on the
+percentage of women in national parliaments''}} going back to 1997 on a
+monthly basis:
+
+\begin{itemize}
+\tightlist
+\item
+  \url{http://archive.ipu.org/wmn-e/classif-arc.htm}
+\end{itemize}
+
+The World Bank data is for ``single or lower parliamentary chambers
+only'', while the IPU also presents data for ``Upper Houses or
+Senates''. Moreover, the IPU provides the actual numbers used to
+calculate the percentages (which the World Bank does not).
+
+\subsection{Data limitations}\label{data-limitations}
+
+Take caution when interpreting these data, as parliamentary systems vary
+from country to country, and in some cases over time. Some of the issues
+to consider include:
+
+\begin{itemize}
+\tightlist
+\item
+  Who has, and who does not have, the right to become a Member of
+  Parliament (MP)?
+\item
+  How does someone become an MP? Through democratic elections? How is
+  ``democratic election'' defined?
+\item
+  What is the real power of MPs and their parliament? Can MPs make a
+  difference?
+\end{itemize}
+
+\subsection{Data definitions \&
+assumptions}\label{data-definitions-assumptions}
+
+\subsubsection{\texorpdfstring{``Women''}{Women}}\label{women}
+
+The definition for ``women'' is not given, so we will assume that it
+refers to a binary classification for gender (sex).
+
+\subsubsection{\texorpdfstring{``Country
+(Region)''}{Country (Region)}}\label{country-region}
+
+The definition of countries and regions can change over time.
+(e.g.~formation of new countries after conflicts, new member states
+joining a pre-existing collective). How are these changes reflected in
+the data? How do they affect the interpretation?
+
+\subsection{Pro tip}\label{pro-tip}
+
+Understand the limitations of your data before anybody else points them
+out to you.
+
+\section{About the data file}\label{about-the-data-file}
+
+The data is stored in a file called:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{API\_SG.GEN.PARL.ZS\_DS2\_en\_csv\_v2\_10473744.csv}
+\end{itemize}
+
+To simplify things we have copied it to \texttt{WB-WiP.csv} (which also
+allows us to maintain the original file in case something goes wrong).
+
+\subsection{Pro tip}\label{pro-tip-1}
+
+Always keep a backup copy of the data. Alternatively, set the data
+file(s) to ``read-only'' to protect it from being overwritten or
+modified.
+
+\subsection{Exercise}\label{exercise}
+
+It is important to look at and understand the contents of the file
+before you start using it. Using a text editor or a spreadsheet
+software, open the \texttt{WB-WiP.csv} file (in the data directory).
+What do you observe in the contents of this file?
+
+\subsection{Content and Structure}\label{content-and-structure}
+
+The first four lines of WB-WiP.csv can be ignored, since they contain
+two lines of meta-information and two blank lines, as follows:
+
+\begin{verbatim}
+ 1  ﻿"Data Source","World Development Indicators",
+ 2  
+ 3  "Last Updated Date","2019-01-30",
+ 4  
+\end{verbatim}
+
+The fifth line contains the column (variable) names and the body of data
+starts in the sixth line. It is important to note that there was no
+collection of data for a majority of the years, which means that it is
+``missing''.
+
+\section{Importing the data}\label{importing-the-data}
+
+Based on our findings above, we can ``skip'' the first four lines and
+treat the fifth line as column (variable) names.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(data.table)}
+\NormalTok{wip <-}\StringTok{ }\KeywordTok{fread}\NormalTok{(}\KeywordTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"WB-WiP.csv"}\NormalTok{), }
+             \DataTypeTok{skip =} \DecValTok{4}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Exercise}\label{exercise-1}
+
+Check what you have read by typing ``\texttt{wip}'' in the console
+window. What do you observe? Type ``\texttt{class(wip)}'' and
+``\texttt{str(wip)}'' to confirm that ``\texttt{wip}'' is of class
+``\texttt{data.table}''.
+
+\subsection{\texorpdfstring{``Fix'' column
+names}{Fix column names}}\label{fix-column-names}
+
+Some of the column names contain spaces while others are numeric:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\CommentTok{#  [1] "Country Name"   "Country Code"  }
+\CommentTok{#  [3] "Indicator Name" "Indicator Code"}
+\CommentTok{#  [5] "1960"           "1961"}
+\KeywordTok{tail}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\CommentTok{#  [1] "2014" "2015" "2016" "2017" "2018" "V64"}
+\end{Highlighting}
+\end{Shaded}
+
+By using the \texttt{make.names()} function we don't need to use back
+ticks (\texttt{\textasciigrave{}}) around the column names (e.g.
+\texttt{\textasciigrave{}col\ name\textasciigrave{}}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{names}\NormalTok{(wip) <-}\StringTok{ }\KeywordTok{make.names}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\KeywordTok{head}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\CommentTok{#  [1] "Country.Name"   "Country.Code"  }
+\CommentTok{#  [3] "Indicator.Name" "Indicator.Code"}
+\CommentTok{#  [5] "X1960"          "X1961"}
+\KeywordTok{tail}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\CommentTok{#  [1] "X2014" "X2015" "X2016" "X2017" "X2018"}
+\CommentTok{#  [6] "V64"}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Data Wrangling Aims}\label{data-wrangling-aims}
+
+We can simplify the production of summaries and plots by restructuring
+the current \texttt{wip} dataset (which has 64 columns) to the following
+format:
+
+\begin{verbatim}
+   Country       Year   pctWiP
+   Country AAA   1997     ##.#
+   Country AAA   1998     ##.#
+   Country AAA   1999     ##.#
+   ...
+\end{verbatim}
+
+pctWiP refers to the percentage of women in parliament.
+
+\subsection{Key information retained}\label{key-information-retained}
+
+These three columns will contain the same information as the
+\texttt{wip} dataset but in a more usable format. We will also add a
+variable for the ratio of male to female MPs.
+
+\subsection{Superfluous columns}\label{superfluous-columns}
+
+We will start by removing columns \texttt{V64}, \texttt{Indicator.Name}
+and \texttt{Indicator.Code}. There are years without any data but they
+will be removed automatically later (when restructuring from ``wide'' to
+``long'' format).
+
+Column \texttt{V64} is created automatically due to an extra comma at
+the end of the column names (fifth) line of \texttt{WB-WiP.csv}:
+
+\begin{verbatim}
+   ... ,"2015","2016","2017","2018",
+\end{verbatim}
+
+\subsection{Check}\label{check}
+
+Before removing it check that all values are \texttt{NA}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wip[, .N, by=.(V64)]}
+\CommentTok{#     V64   N}
+\CommentTok{#  1:  NA 264}
+\end{Highlighting}
+\end{Shaded}
+
+Column \texttt{Indicator.Name} has the unique value \emph{``Proportion
+of seats held by women in national parliaments (\%)''} and in
+\texttt{Indicator.Code} it is \emph{``SG.GEN.PARL.ZS''}. As there is
+only one indicator in this dataset we will remove these two columns.
+
+\subsection{Exercise}\label{exercise-2}
+
+Confirm that both \texttt{Indicator.Name} and \texttt{Indicator.Code}
+have the same values for all observations. Hint: Use the approach above
+for variable \texttt{V64}
+
+\subsection{Removing columns}\label{removing-columns}
+
+The indicator and \texttt{V64} columns can be removed. We will also
+rename ``\texttt{Country.Name}'' as ``\texttt{Country}'' and
+``\texttt{Country.Code}'' as ``\texttt{Code}''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wip[, }\KeywordTok{c}\NormalTok{(}\StringTok{"Indicator.Name"}\NormalTok{, }\StringTok{"Indicator.Code"}\NormalTok{, }
+        \StringTok{"V64"}\NormalTok{)}\OperatorTok{:}\ErrorTok{=}\OtherTok{NULL}\NormalTok{]}
+\KeywordTok{setnames}\NormalTok{(wip, }\KeywordTok{c}\NormalTok{(}\StringTok{"Country.Name"}\NormalTok{, }\StringTok{"Country.Code"}\NormalTok{), }
+              \KeywordTok{c}\NormalTok{(}\StringTok{"Country"}\NormalTok{, }\StringTok{"Code"}\NormalTok{))}
+\KeywordTok{head}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\CommentTok{#  [1] "Country" "Code"    "X1960"   "X1961"  }
+\CommentTok{#  [5] "X1962"   "X1963"}
+\KeywordTok{tail}\NormalTok{(}\KeywordTok{names}\NormalTok{(wip))}
+\CommentTok{#  [1] "X2013" "X2014" "X2015" "X2016" "X2017"}
+\CommentTok{#  [6] "X2018"}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Reshape to long format}\label{reshape-to-long-format}
+
+We want to transform the data so that for each country the year (column)
+data becomes a row. At the same time we will remove the missing data
+(with the \texttt{na.rm} option).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WP <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(wip,}
+           \DataTypeTok{id.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"Country"}\NormalTok{, }\StringTok{"Code"}\NormalTok{),}
+           \DataTypeTok{measure =} \KeywordTok{patterns}\NormalTok{(}\StringTok{"^X"}\NormalTok{),}
+           \DataTypeTok{variable.name =} \StringTok{"YearC"}\NormalTok{,}
+           \DataTypeTok{value.name =} \KeywordTok{c}\NormalTok{(}\StringTok{"pctWiP"}\NormalTok{),}
+           \DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{WP}
+\CommentTok{#             Country Code YearC pctWiP}
+\CommentTok{#     1:  Afghanistan  AFG X1990   3.70}
+\CommentTok{#     2:       Angola  AGO X1990  14.50}
+\CommentTok{#     3:      Albania  ALB X1990  28.80}
+\CommentTok{#     4:   Arab World  ARB X1990   3.89}
+\CommentTok{#    ---                               }
+\CommentTok{#  5107:  Yemen, Rep.  YEM X2018   0.00}
+\CommentTok{#  5108: South Africa  ZAF X2018  42.30}
+\CommentTok{#  5109:       Zambia  ZMB X2018  18.00}
+\CommentTok{#  5110:     Zimbabwe  ZWE X2018  31.50}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Final tweaks to
+\texttt{WP}}{Final tweaks to WP}}\label{final-tweaks-to-wp}
+
+Create a numeric \texttt{Year} variable and a \texttt{Ratio} of men to
+women in parliament.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WP[, }\StringTok{`}\DataTypeTok{:=}\StringTok{`}\NormalTok{(}\DataTypeTok{Year=}\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{gsub}\NormalTok{(}\StringTok{"[^[:digit:].]"}\NormalTok{, }
+                               \StringTok{""}\NormalTok{,  YearC)),}
+          \DataTypeTok{Ratio =}\NormalTok{ (}\DecValTok{100}\OperatorTok{-}\NormalTok{pctWiP)}\OperatorTok{/}\NormalTok{pctWiP)][}
+\NormalTok{            , YearC}\OperatorTok{:}\ErrorTok{=}\OtherTok{NULL}\NormalTok{]}
+\KeywordTok{setcolorder}\NormalTok{(WP, }\KeywordTok{c}\NormalTok{(}\StringTok{"Country"}\NormalTok{, }\StringTok{"Code"}\NormalTok{, }\StringTok{"Year"}\NormalTok{, }
+                  \StringTok{"pctWiP"}\NormalTok{, }\StringTok{"Ratio"}\NormalTok{))}
+\CommentTok{# Look at the contents of WP}
+\NormalTok{WP}
+\CommentTok{#             Country Code Year pctWiP Ratio}
+\CommentTok{#     1:  Afghanistan  AFG 1990   3.70 26.03}
+\CommentTok{#     2:       Angola  AGO 1990  14.50  5.90}
+\CommentTok{#     3:      Albania  ALB 1990  28.80  2.47}
+\CommentTok{#     4:   Arab World  ARB 1990   3.89 24.70}
+\CommentTok{#    ---                                    }
+\CommentTok{#  5107:  Yemen, Rep.  YEM 2018   0.00   Inf}
+\CommentTok{#  5108: South Africa  ZAF 2018  42.30  1.36}
+\CommentTok{#  5109:       Zambia  ZMB 2018  18.00  4.56}
+\CommentTok{#  5110:     Zimbabwe  ZWE 2018  31.50  2.17}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Questions}\label{questions}
+
+The objective is to look at the geographical and time trends in the
+data. We will answer the following questions.
+
+\begin{itemize}
+\tightlist
+\item
+  What are the time trends for Portugal?
+\item
+  How does Portugal compare to other countries?
+\item
+  Which countries have the highest percentage of women in parliament by
+  year?
+\item
+  How do continents compare?
+\item
+  What are the global trends over time?
+\end{itemize}
+
+\subsection{Exercise}\label{exercise-3}
+
+\begin{itemize}
+\tightlist
+\item
+  Which country do you think has the highest percentage of women in
+  parliament?
+\item
+  In each continent (i.e.~Africa, Americas, Asia, Europe and Oceania),
+  which country has the highest percentage of women in parliament?
+\item
+  What is the world percentage of women in parliament in 2018?
+\end{itemize}
+
+\section{Exploratory Analysis}\label{exploratory-analysis}
+
+\subsection{Select a country}\label{select-a-country}
+
+This guide explores how Portugal performs over time and compared to
+other countries. Before continuing, select another country for yourself
+to repeat the examples and do the exercises.
+
+\subsection{Time trends for Portugal}\label{time-trends-for-portugal}
+
+First look at the raw data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WP[Country }\OperatorTok{%in%}\StringTok{ "Portugal"}\NormalTok{]}
+\CommentTok{#       Country Code Year pctWiP Ratio}
+\CommentTok{#   1: Portugal  PRT 1990    7.6 12.16}
+\CommentTok{#   2: Portugal  PRT 1997   13.0  6.69}
+\CommentTok{#   3: Portugal  PRT 1998   13.0  6.69}
+\CommentTok{#   4: Portugal  PRT 1999   18.7  4.35}
+\CommentTok{#   5: Portugal  PRT 2000   17.4  4.75}
+\CommentTok{#   6: Portugal  PRT 2001   18.7  4.35}
+\CommentTok{#   7: Portugal  PRT 2002   19.1  4.24}
+\CommentTok{#   8: Portugal  PRT 2003   19.1  4.24}
+\CommentTok{#   9: Portugal  PRT 2004   19.1  4.24}
+\CommentTok{#  10: Portugal  PRT 2005   21.3  3.69}
+\CommentTok{#  11: Portugal  PRT 2006   21.3  3.69}
+\CommentTok{#  12: Portugal  PRT 2007   28.3  2.53}
+\CommentTok{#  13: Portugal  PRT 2008   28.3  2.53}
+\CommentTok{#  14: Portugal  PRT 2009   27.4  2.65}
+\CommentTok{#  15: Portugal  PRT 2010   27.4  2.65}
+\CommentTok{#  16: Portugal  PRT 2011   28.7  2.48}
+\CommentTok{#  17: Portugal  PRT 2012   28.7  2.48}
+\CommentTok{#  18: Portugal  PRT 2013   28.7  2.48}
+\CommentTok{#  19: Portugal  PRT 2014   31.3  2.19}
+\CommentTok{#  20: Portugal  PRT 2015   34.8  1.87}
+\CommentTok{#  21: Portugal  PRT 2016   34.8  1.87}
+\CommentTok{#  22: Portugal  PRT 2017   34.8  1.87}
+\CommentTok{#  23: Portugal  PRT 2018   34.8  1.87}
+\CommentTok{#       Country Code Year pctWiP Ratio}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Visualisation}\label{visualisation}
+
+It is easier to find trends within a plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(magrittr)}
+\NormalTok{WP[Country }\OperatorTok{%in%}\StringTok{ "Portugal"}\NormalTok{] }\OperatorTok{%>%}\StringTok{ }
+\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Year, pctWiP)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{limits=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"% Women in Parliament"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/PTplot-1} \end{center}
+
+\subsubsection{Interpretation}\label{interpretation}
+
+In 1990 Portugal had 7.6\% women in parliament, which increased to
+34.8\% in 2018. This still falls short of 50\% (i.e.~point of gender
+parity in parliament).
+
+\subsection{Exercise}\label{exercise-4}
+
+For your chosen country look at the time trend data and the plot. What
+is your interpretation? How does it compare to Portugal?
+
+\subsection{Portugal versus European Union (EU)
+countries}\label{portugal-versus-european-union-eu-countries}
+
+We selected six EU countries for comparison (due to space limitations).
+It would be better to compare all EU and/or all European countries.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WP[Country }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Portugal"}\NormalTok{, }\StringTok{"Sweden"}\NormalTok{, }\StringTok{"Spain"}\NormalTok{,}
+     \StringTok{"Hungary"}\NormalTok{, }\StringTok{"Romania"}\NormalTok{, }\StringTok{"Finland"}\NormalTok{, }\StringTok{"Germany"}\NormalTok{,}
+                           \StringTok{"European Union"}\NormalTok{)] }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Year, pctWiP, }\DataTypeTok{colour=}\NormalTok{Country)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{2020}\NormalTok{, }\DecValTok{5}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{limits=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{), }
+                     \DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{50}\NormalTok{, }\DataTypeTok{by=}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Women in Parliament: EU Countries"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"% Women in Parliament"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/euPctPlot-1} \end{center}
+
+\subsubsection{Interpretation}\label{interpretation-1}
+
+Since 2012 Portugal has had more women in parliament than the European
+Union average. Hungary and Romania both had a higher percentage of women
+in parliament in 1990 (around the end of the Cold War) than they have
+had since. The key point to note is that none of these countries reaches
+equality between males and females in parliament, although Sweden and
+Finland come closest.
+
+\subsection{A couple of points to
+note}\label{a-couple-of-points-to-note}
+
+\subsubsection{\texorpdfstring{``Germany''}{Germany}}\label{germany}
+
+In October 1990, the process of ``German reunification'' lead to the
+creation of Germany, which united the former ``German Democratic
+Republic'' (East Germany) and the ``Federal Republic of Germany'' (West
+Germany). Therefore, since reunification, the data is presented for the
+reunified ``Germany'' only. Careful thought should be given to handling,
+analysing and interpreting any pre-reunification data (if available).
+
+\subsubsection{\texorpdfstring{``European
+Union''}{European Union}}\label{european-union}
+
+The ``European Union'' has changed over time (unlike the ``continent of
+Europe''). It started in the 1950s as a block of six European countries
+(known as the ``European Community'') and has expanded over the years to
+28 countries (with the United Kingdom about to depart). This raises the
+question of how the European Union average is calculated. For a given
+year, is it calculated based on the actual member states in that year or
+on all of the current member states?
+
+\subsection{Exercises}\label{exercises}
+
+Compare the country of your choice to four or five other countries by
+plotting a line graph similar to the one above.
+
+\subsection{Countries with the highest percentage of women in
+parliament}\label{countries-with-the-highest-percentage-of-women-in-parliament}
+
+A quick answer can be obtained by looking at the highest percentages.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WP[}\KeywordTok{order}\NormalTok{(}\OperatorTok{-}\NormalTok{pctWiP), }\KeywordTok{head}\NormalTok{(.SD, }\DecValTok{10}\NormalTok{)]}
+\CommentTok{#      Country Code Year pctWiP Ratio}
+\CommentTok{#   1:  Rwanda  RWA 2013   63.8 0.567}
+\CommentTok{#   2:  Rwanda  RWA 2014   63.8 0.567}
+\CommentTok{#   3:  Rwanda  RWA 2015   63.8 0.567}
+\CommentTok{#   4:  Rwanda  RWA 2016   63.8 0.567}
+\CommentTok{#   5:  Rwanda  RWA 2017   61.3 0.631}
+\CommentTok{#   6:  Rwanda  RWA 2018   61.3 0.631}
+\CommentTok{#   7:  Rwanda  RWA 2008   56.3 0.776}
+\CommentTok{#   8:  Rwanda  RWA 2009   56.3 0.776}
+\CommentTok{#   9:  Rwanda  RWA 2010   56.3 0.776}
+\CommentTok{#  10:  Rwanda  RWA 2011   56.3 0.776}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Data speaks}\label{data-speaks}
+
+Are you surprised? Data can be very enlightening.
+
+\subsection{Highest percentage by
+year}\label{highest-percentage-by-year}
+
+Which countries have the highest percentage of women in parliament by
+year?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WP[}\KeywordTok{order}\NormalTok{(Year, }\OperatorTok{-}\NormalTok{pctWiP), }\KeywordTok{head}\NormalTok{(.SD, }\DecValTok{1}\NormalTok{), by =}\StringTok{ }\NormalTok{Year]}
+\CommentTok{#      Year Country Code pctWiP Ratio}
+\CommentTok{#   1: 1990  Sweden  SWE   38.4 1.604}
+\CommentTok{#   2: 1997  Sweden  SWE   40.4 1.475}
+\CommentTok{#   3: 1998  Sweden  SWE   40.4 1.475}
+\CommentTok{#   4: 1999  Sweden  SWE   42.7 1.342}
+\CommentTok{#   5: 2000  Sweden  SWE   42.7 1.342}
+\CommentTok{#   6: 2001  Sweden  SWE   42.7 1.342}
+\CommentTok{#   7: 2002  Sweden  SWE   45.0 1.222}
+\CommentTok{#   8: 2003  Rwanda  RWA   48.8 1.049}
+\CommentTok{#   9: 2004  Rwanda  RWA   48.8 1.049}
+\CommentTok{#  10: 2005  Rwanda  RWA   48.8 1.049}
+\CommentTok{#  11: 2006  Rwanda  RWA   48.8 1.049}
+\CommentTok{#  12: 2007  Rwanda  RWA   48.8 1.049}
+\CommentTok{#  13: 2008  Rwanda  RWA   56.3 0.776}
+\CommentTok{#  14: 2009  Rwanda  RWA   56.3 0.776}
+\CommentTok{#  15: 2010  Rwanda  RWA   56.3 0.776}
+\CommentTok{#  16: 2011  Rwanda  RWA   56.3 0.776}
+\CommentTok{#  17: 2012  Rwanda  RWA   56.3 0.776}
+\CommentTok{#  18: 2013  Rwanda  RWA   63.8 0.567}
+\CommentTok{#  19: 2014  Rwanda  RWA   63.8 0.567}
+\CommentTok{#  20: 2015  Rwanda  RWA   63.8 0.567}
+\CommentTok{#  21: 2016  Rwanda  RWA   63.8 0.567}
+\CommentTok{#  22: 2017  Rwanda  RWA   61.3 0.631}
+\CommentTok{#  23: 2018  Rwanda  RWA   61.3 0.631}
+\CommentTok{#      Year Country Code pctWiP Ratio}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Merging continent}\label{merging-continent}
+
+The variable \texttt{Country} in the \texttt{WP} dataset is a mix of
+countries and regions (e.g. ``European Union'', ``South Asia'' and
+``World''). To present the highest percentages grouped by continent we
+need to add it. Luckily, given the large number of R packages available,
+we can merge the ``\texttt{continent}'' from the ``\texttt{codelist}''
+dataset in the ``\texttt{countrycode}'' package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Ensure that 'countrycode' package is installed.}
+\CommentTok{# install.packages("countrycode")}
+\KeywordTok{library}\NormalTok{(countrycode)}
+\NormalTok{cl <-}\StringTok{ }\KeywordTok{as.data.table}\NormalTok{(codelist)[, .(continent, wb)]}
+\KeywordTok{setnames}\NormalTok{(cl, }\KeywordTok{c}\NormalTok{(}\StringTok{"continent"}\NormalTok{, }\StringTok{"wb"}\NormalTok{), }
+             \KeywordTok{c}\NormalTok{(}\StringTok{"Continent"}\NormalTok{, }\StringTok{"Code"}\NormalTok{))}
+\NormalTok{cWP <-}\StringTok{ }\NormalTok{cl[WP, on=}\StringTok{"Code"}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Highest percentages by year and
+continent}\label{highest-percentages-by-year-and-continent}
+
+Which countries have the highest percentages in 1990 and 2018?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[Year }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{2018}\NormalTok{) }\OperatorTok{&}\StringTok{ }\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(Continent)][}
+    \KeywordTok{order}\NormalTok{(Year, }\OperatorTok{-}\NormalTok{pctWiP), }\KeywordTok{head}\NormalTok{(.SD, }\DecValTok{1}\NormalTok{), }
+\NormalTok{    by =}\StringTok{ }\NormalTok{.(Year, Continent)][}
+    \KeywordTok{order}\NormalTok{(Continent, Year), }
+\NormalTok{    .(Continent, Year, Country, pctWiP)]}
+\CommentTok{#      Continent Year       Country pctWiP}
+\CommentTok{#   1:    Africa 1990 Guinea-Bissau   20.0}
+\CommentTok{#   2:    Africa 2018        Rwanda   61.3}
+\CommentTok{#   3:  Americas 1990        Guyana   36.9}
+\CommentTok{#   4:  Americas 2018          Cuba   53.2}
+\CommentTok{#   5:      Asia 1990       Armenia   35.6}
+\CommentTok{#   6:      Asia 2018   Timor-Leste   33.8}
+\CommentTok{#   7:    Europe 1990        Sweden   38.4}
+\CommentTok{#   8:    Europe 2018        Sweden   46.1}
+\CommentTok{#   9:   Oceania 1990   New Zealand   14.4}
+\CommentTok{#  10:   Oceania 2018   New Zealand   38.3}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Decline in percentage}\label{decline-in-percentage}
+
+Which countries have had a decline in percentage since their first
+measurement (not always 1990)?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dWP <-}\StringTok{ }\NormalTok{cWP[}
+  \KeywordTok{order}\NormalTok{(Country, Year), .SD[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,.N)], }
+\NormalTok{   by=Country][,}
+\NormalTok{  pctDiff }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{pctWiP }\OperatorTok{-}\StringTok{ }\KeywordTok{shift}\NormalTok{(pctWiP), by=Country][}
+\NormalTok{  pctDiff}\OperatorTok{<}\DecValTok{0}\NormalTok{][}
+  \KeywordTok{order}\NormalTok{(pctDiff)]}
+\NormalTok{dWP[}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(Continent),}
+\NormalTok{    .(Country, pctWiP, pctDiff)]}
+\CommentTok{#                        Country pctWiP pctDiff}
+\CommentTok{#   1:                   Armenia   18.1   -17.5}
+\CommentTok{#   2:                   Romania   20.7   -13.7}
+\CommentTok{#   3:                   Hungary   12.6    -8.1}
+\CommentTok{#   4:                  Mongolia   17.1    -7.8}
+\CommentTok{#   5:             Guinea-Bissau   13.7    -6.3}
+\CommentTok{#   6:                    Guyana   31.9    -5.0}
+\CommentTok{#   7: Korea, Dem. People’s Rep.   16.3    -4.8}
+\CommentTok{#   8:                   Vanuatu    0.0    -4.3}
+\CommentTok{#   9:               Yemen, Rep.    0.0    -4.1}
+\CommentTok{#  10:                      Mali    8.8    -3.4}
+\CommentTok{#  11:               Congo, Rep.   11.3    -3.0}
+\CommentTok{#  12:                      Oman    1.2    -1.2}
+\CommentTok{#  13:              Turkmenistan   24.8    -1.2}
+\CommentTok{#  14:                     Haiti    2.5    -1.1}
+\CommentTok{#  15:                    Tuvalu    6.7    -1.0}
+\CommentTok{#  16:                   Albania   27.9    -0.9}
+\CommentTok{#  17:                  Maldives    5.9    -0.4}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Visualisation}\label{visualisation-1}
+
+We will plot the trend lines for countries with at least a 5\% decline.
+Note that the ``5\%'' is arbitrarily selected.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Select the countries to plot}
+\NormalTok{dclpct <-}\StringTok{ }\KeywordTok{unique}\NormalTok{(dWP[}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(Continent) }\OperatorTok{&}
+\StringTok{                   }\NormalTok{pctDiff }\OperatorTok{<=}\StringTok{ }\OperatorTok{-}\DecValTok{5}\NormalTok{]}\OperatorTok{$}\NormalTok{Country)}
+
+\NormalTok{WP[Country }\OperatorTok{%in%}\StringTok{ }\NormalTok{dclpct] }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Year, pctWiP, }\DataTypeTok{colour=}\NormalTok{Country)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{2020}\NormalTok{, }\DecValTok{5}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{limits=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{40}\NormalTok{),}
+  \DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{40}\NormalTok{, }\DataTypeTok{by=}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Women in Parliament: Decline >=5%"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"% Women in Parliament"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/decline5pct-1} \end{center}
+
+\subsubsection{Interpretation}\label{interpretation-2}
+
+There is a consistent decline between 1990 and 1997 that should be
+investigated in collaboration with a subject matter expert to understand
+the potential causes.
+
+\subsection{Ranked status}\label{ranked-status}
+
+Another way to look at the data is to look at the ranking of countries,
+which could be done at a global level or by continent. Nonetheless, the
+results should be interpreted with caution and an understanding of the
+actual percentages. For example, if most countries were around the 50\%
+mark, rankings could be misleading and subject to random fluctuations.
+
+\subsection{Global ranks by year}\label{global-ranks-by-year}
+
+We will rank the countries by year based on the percentage of women in
+parliaments. The countries with the highest percentage will be ranked
+first and the lowest last. A total for the number of countries with data
+is included as it varies by year.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(Continent), }
+    \StringTok{`}\DataTypeTok{:=}\StringTok{`}\NormalTok{(}\DataTypeTok{RankG =} \KeywordTok{rank}\NormalTok{(}\OperatorTok{-}\NormalTok{pctWiP), }\DataTypeTok{TotalG =}\NormalTok{ .N),}
+\NormalTok{        by =}\StringTok{ }\NormalTok{.(Year)]}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Global ranking -- Portugal}\label{global-ranking-portugal}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[Country}\OperatorTok{==}\StringTok{"Portugal"}\NormalTok{, }
+\NormalTok{    .(Country, Year, pctWiP, RankG, TotalG)][}
+      \KeywordTok{order}\NormalTok{(Year)]}
+\CommentTok{#       Country Year pctWiP RankG TotalG}
+\CommentTok{#   1: Portugal 1990    7.6  66.0    138}
+\CommentTok{#   2: Portugal 1997   13.0  41.5    161}
+\CommentTok{#   3: Portugal 1998   13.0  49.5    163}
+\CommentTok{#   4: Portugal 1999   18.7  24.0    154}
+\CommentTok{#   5: Portugal 2000   17.4  34.0    158}
+\CommentTok{#   6: Portugal 2001   18.7  33.0    168}
+\CommentTok{#   7: Portugal 2002   19.1  41.0    161}
+\CommentTok{#   8: Portugal 2003   19.1  46.0    175}
+\CommentTok{#   9: Portugal 2004   19.1  54.0    182}
+\CommentTok{#  10: Portugal 2005   21.3  45.5    185}
+\CommentTok{#  11: Portugal 2006   21.3  49.5    189}
+\CommentTok{#  12: Portugal 2007   28.3  28.0    188}
+\CommentTok{#  13: Portugal 2008   28.3  28.0    187}
+\CommentTok{#  14: Portugal 2009   27.4  33.0    187}
+\CommentTok{#  15: Portugal 2010   27.4  34.0    187}
+\CommentTok{#  16: Portugal 2011   28.7  31.0    188}
+\CommentTok{#  17: Portugal 2012   28.7  35.0    188}
+\CommentTok{#  18: Portugal 2013   28.7  39.0    186}
+\CommentTok{#  19: Portugal 2014   31.3  35.0    187}
+\CommentTok{#  20: Portugal 2015   34.8  29.0    188}
+\CommentTok{#  21: Portugal 2016   34.8  27.0    191}
+\CommentTok{#  22: Portugal 2017   34.8  28.0    192}
+\CommentTok{#  23: Portugal 2018   34.8  29.0    192}
+\CommentTok{#       Country Year pctWiP RankG TotalG}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Interpretation}\label{interpretation-3}
+
+Portugal has generally been ranked in the first quartile (25\%) of
+countries in the world, with the fluctuations of its ranking subject to
+random variation.
+
+\subsection{Exercise}\label{exercise-5}
+
+For your chosen country, interpret its ranking over the years. How does
+it compare to Portugal?
+
+\subsection{Continent ranks by year}\label{continent-ranks-by-year}
+
+We will rank the countries by year within a continent based on the
+percentage of women in parliaments. The countries with the highest
+percentage will be ranked first and the lowest last. A total for the
+number of countries with data, within each continent, is included as it
+varies by year.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(Continent), }
+    \StringTok{`}\DataTypeTok{:=}\StringTok{`}\NormalTok{(}\DataTypeTok{RankC =} \KeywordTok{rank}\NormalTok{(}\OperatorTok{-}\NormalTok{pctWiP), }\DataTypeTok{TotalC =}\NormalTok{ .N),}
+\NormalTok{        by =}\StringTok{ }\NormalTok{.(Continent, Year)]}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Portugal's ranking in
+Europe}\label{portugals-ranking-in-europe}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[Country}\OperatorTok{==}\StringTok{"Portugal"}\NormalTok{, }
+\NormalTok{    .(Country, Year, pctWiP, RankC, TotalC)][}
+      \KeywordTok{order}\NormalTok{(Year)]}
+\CommentTok{#       Country Year pctWiP RankC TotalC}
+\CommentTok{#   1: Portugal 1990    7.6  22.0     28}
+\CommentTok{#   2: Portugal 1997   13.0  16.5     39}
+\CommentTok{#   3: Portugal 1998   13.0  18.5     37}
+\CommentTok{#   4: Portugal 1999   18.7  12.0     38}
+\CommentTok{#   5: Portugal 2000   17.4  16.0     38}
+\CommentTok{#   6: Portugal 2001   18.7  15.0     41}
+\CommentTok{#   7: Portugal 2002   19.1  15.0     39}
+\CommentTok{#   8: Portugal 2003   19.1  17.0     41}
+\CommentTok{#   9: Portugal 2004   19.1  21.0     42}
+\CommentTok{#  10: Portugal 2005   21.3  20.0     42}
+\CommentTok{#  11: Portugal 2006   21.3  21.0     44}
+\CommentTok{#  12: Portugal 2007   28.3  15.0     44}
+\CommentTok{#  13: Portugal 2008   28.3  13.0     44}
+\CommentTok{#  14: Portugal 2009   27.4  15.0     44}
+\CommentTok{#  15: Portugal 2010   27.4  15.0     44}
+\CommentTok{#  16: Portugal 2011   28.7  14.0     44}
+\CommentTok{#  17: Portugal 2012   28.7  15.0     43}
+\CommentTok{#  18: Portugal 2013   28.7  17.0     43}
+\CommentTok{#  19: Portugal 2014   31.3  16.0     43}
+\CommentTok{#  20: Portugal 2015   34.8  12.0     43}
+\CommentTok{#  21: Portugal 2016   34.8  11.0     43}
+\CommentTok{#  22: Portugal 2017   34.8  12.0     43}
+\CommentTok{#  23: Portugal 2018   34.8  12.0     43}
+\CommentTok{#       Country Year pctWiP RankC TotalC}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Plot of Portugal's ranking in
+Europe}\label{plot-of-portugals-ranking-in-europe}
+
+Below we reproduce the percentage plot to show how Portugal ranks in
+relation to six other European countries. Note that the highest
+percentage is ranked first and the lowest last.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[Country }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Portugal"}\NormalTok{, }\StringTok{"Sweden"}\NormalTok{, }\StringTok{"Spain"}\NormalTok{,}
+  \StringTok{"Hungary"}\NormalTok{, }\StringTok{"Romania"}\NormalTok{, }\StringTok{"Finland"}\NormalTok{, }\StringTok{"Germany"}\NormalTok{)] }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Year, RankC, }\DataTypeTok{colour=}\NormalTok{Country)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{2020}\NormalTok{, }\DecValTok{5}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{limits=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{45}\NormalTok{), }
+                     \DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{45}\NormalTok{, }\DataTypeTok{by=}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Women in Parliament: Ranked"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Rank in Europe"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/euRankplot-1} \end{center}
+
+\subsubsection{Interpretation}\label{interpretation-4}
+
+A total of 28 European countries had data in 1990, 39 in 1997 and 43 in
+2018. Within Europe, Portugal was typically ranked in the second
+quartile (25-50\%) with the fluctuations of its ranking subject to
+random variation.
+
+\subsection{Exercise}\label{exercise-6}
+
+How does your chosen country rank within its continent?
+
+\subsection{Highest rank by year and
+continent}\label{highest-rank-by-year-and-continent}
+
+Which countries have the highest rank in 1990 and 2018? The answer will
+coincide with the highest percentages (see above).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cWP[Year }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{2018}\NormalTok{) }\OperatorTok{&}\StringTok{ }\NormalTok{RankC}\OperatorTok{==}\DecValTok{1}\NormalTok{][}
+    \KeywordTok{order}\NormalTok{(Continent, Year), }
+\NormalTok{      .(Continent, Year, Country, pctWiP, RankC)]}
+\CommentTok{#   Continent Year       Country pctWiP RankC}
+\CommentTok{#      Africa 1990 Guinea-Bissau   20.0     1}
+\CommentTok{#      Africa 2018        Rwanda   61.3     1}
+\CommentTok{#    Americas 1990        Guyana   36.9     1}
+\CommentTok{#    Americas 2018          Cuba   53.2     1}
+\CommentTok{#        Asia 1990       Armenia   35.6     1}
+\CommentTok{#        Asia 2018   Timor-Leste   33.8     1}
+\CommentTok{#      Europe 1990        Sweden   38.4     1}
+\CommentTok{#      Europe 2018        Sweden   46.1     1}
+\CommentTok{#     Oceania 1990   New Zealand   14.4     1}
+\CommentTok{#     Oceania 2018   New Zealand   38.3     1}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Overall picture}\label{overall-picture}
+
+What are the trends globally? There are various regions defined in the
+World Bank data. We can plot them and highlight the world ``average''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(gghighlight)}
+\NormalTok{cWP[}\KeywordTok{is.na}\NormalTok{(Continent)] }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Year, pctWiP, }\DataTypeTok{group=}\NormalTok{Country)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{gghighlight}\NormalTok{(Country}\OperatorTok{==}\StringTok{"World"}\NormalTok{, }
+              \DataTypeTok{use_direct_label =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{1990}\NormalTok{, }\DecValTok{2020}\NormalTok{, }\DecValTok{5}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{limits=}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{40}\NormalTok{), }
+                     \DataTypeTok{breaks=}\KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{40}\NormalTok{, }\DataTypeTok{by=}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Women in Parliament: Global Trends"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ylab}\NormalTok{(}\StringTok{"% Women in Parliament"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/globalTrends-1} \end{center}
+
+\subsubsection{Interpretation}\label{interpretation-5}
+
+The grey lines show that regardless of how we define region the general
+trends are upwards. The ``World'' percentage (black line) increased
+between 1997 and 2018. In 2018, women in parliament represented 24\%
+(i.e.~a ratio of 3.17 men to each woman), which is still less than half
+the level before gender parity can be claimed.
+
+\section{Conclusion}\label{conclusion}
+
+This guide presented an analysis of the percentage of women in
+parliament as a real-life case study for the data.table package.
+Although the format limited what could be presented, we can conclude
+that the percentage of women in parliament is increasing but that gender
+parity in parliaments is still far-off.
+
+There is a lot more that can be said and discussed about the
+limitations, interpretation and potential impact of this data which the
+World Bank has nicely
+\href{https://databank.worldbank.org/data/reports.aspx?source=2\&type=metadata\&series=SG.GEN.PARL.ZS\#}{summarised}.\footnote{\url{https://databank.worldbank.org/data/reports.aspx?source=2\&type=metadata\&series=SG.GEN.PARL.ZS}.}
+You are strongly encouraged to read their discussion for a more complete
+understanding.
+
+%\showmatmethods
+
+
+\bibliography{pinp}
+\bibliographystyle{jss}
+
+
+
+\end{document}
+

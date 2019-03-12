@@ -1,0 +1,680 @@
+---
+title: Women in Parliament -- data.table
+
+# Use letters for affiliations
+author: 
+  - name: Saghir Bashir
+#     affiliation: a
+#   - name: Second Author
+#     affiliation: a,b
+
+# address:
+#   - code: a
+#     address: Institute of Smoke and Magic, University of Sometown, Sometown, XY, 12345
+#   - code: b
+#     address: Department of Neat Tricks, Whereever State University, Someplace, MC, 67890
+    
+# Optional: line of arbitrary text with additional information.
+# Could be used, for example, to mention the bibliographic info in a post-print.
+# If not specified, defaults to "This version was compiled on \today"
+#date_subtitle: Published in *Journal of Statistical Software*, 2018
+
+# For footer text  TODO(fold into template, allow free form two-authors)
+lead_author_surname: "[CC BY SA](https://creativecommons.org/licenses/by-sa/4.0/) [ilustat](https://ilustat.com/) $\\bullet$ [info@ilustat.com](mailto:info@ilustat.com)"
+
+# Place eg a DOI URL or CRAN Package URL here
+doi_footer: "Learn more at https://ilustat.com/resources/"
+
+# Abstract
+abstract: |
+  We will use the World Bank’s indicator data for “Women in Parliament” as a case 
+  study when working with the data.table R package. We will guide you through the 
+  geographical and time trends for the percentage of women in national parliaments. 
+  We will start by learning about and understanding the raw data, which we will 
+  then process (“wrangle”) in preparation for some exploratory analysis.
+
+# Optional: Acknowledgements
+# acknowledgements: |
+  
+# Optional: One or more keywords
+keywords:
+  - Women in Parliament
+  - World Bank Indicator
+  - data.table
+  - Tinyverse
+
+# Paper size for the document, values of letterpaper and a4paper
+papersize: a4
+
+# Font size of the document, values of 9pt (default), 10pt, 11pt and 12pt
+fontsize: 9pt
+
+# Optional: Force one-column layout, default is two-column
+#one_column: true
+
+# Optional: Enables lineno mode, but only if one_column mode is also true
+#lineno: true
+
+# Optional: Enable one-sided layout, default is two-sided
+#one_sided: true
+
+# Optional: Enable section numbering, default is unnumbered
+numbersections: true
+
+# Optional: Specify the depth of section number, default is 5
+secnumdepth: 3
+
+# Optional: Skip inserting final break between acknowledgements, default is false
+skip_final_break: true
+
+# Optional: Bibliography 
+bibliography: pinp
+
+# Optional: Enable a 'Draft' watermark on the document
+watermark: true
+
+# Customize footer, eg by referencing the vignette
+footer_contents: "Women in Parliament -- data.table"
+
+# Produce a pinp document
+output: 
+  pinp::pinp:
+    fig_caption: yes
+    collapse: true
+    keep_tex: false
+    latex_engine: xelatex
+    
+# Required: Vignette metadata for inclusion in a package.
+vignette: >
+  %\VignetteIndexEntry{YourPackage-vignetteentry}
+  %\VignetteKeywords{YourPackage, r, anotherkeyword}
+  %\VignettePackage{YourPackage}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE) #, knitr.table.format = 'latex')
+library(data.table)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+options(width=45)
+knitr::opts_chunk$set(fig.pos = 'H')
+
+# Reset the data.table print options.
+options(datatable.print.topn=4, digits=3)
+
+# Finding files using here package
+library(here)
+here()
+
+# Making some aesthetic changes for this document
+theme_set(theme_gray(base_size = 9))
+update_geom_defaults("point", list(size = 0.5))
+update_geom_defaults("boxplot", list(outlier.size = 0.5))
+```
+
+# Preface
+
+We present a real-life case study for the data.table1 package using the World Bank’s 
+“Women in Parliament” indicator data. To get the most out of this case-study guide, 
+repeat the examples and do the exercises whilst reading it.
+
+## Guide materials
+
+You can download materials for this guide from this link:
+
+- [https://ilustat.com/shared/WiP-rdatatable.zip](https://ilustat.com/shared/WiP-rdatatable.zip) 
+
+Unzip the file, which contains the data, this guide and an R markdown exercise file. 
+We advise you to work with WiP-Exercise.Rmd. If you are using RStudio, you can 
+double click on WiP-dt.Rproj to get started. 
+
+# Objectives
+
+*Explore the geographical and time trends for the percentage of women[^objNote] in 
+national parliaments.*
+
+# Understanding the Data
+
+## The World Bank Data 
+
+The raw data for *"Proportion of seats held by women in national parliaments"* 
+includes the percentage of women in parliament (_"single or lower parliamentary chambers 
+only"_) by country (region) and year. It can be downloaded from:[^wbstats]
+
+- https://data.worldbank.org/indicator/SG.GEN.PARL.ZS 
+
+As part of its "open data" mission the World Bank offers _"free and open access 
+to global development data"_ kindly licensed under the "Creative Commons Attribution 
+4.0 (CC-BY 4.0)".[^CC4]
+
+## Source Data
+
+The data originates from the "Inter-Parliamentary Union" (IPU)[^ipuwebsite] which
+provides an *_"Archive of statistical data on the percentage of women in 
+national parliaments"_* going back to 1997 on a monthly basis:
+
+- http://archive.ipu.org/wmn-e/classif-arc.htm
+
+The World Bank data is for “single or lower parliamentary chambers only”, while 
+the IPU also presents data for “Upper Houses or Senates”. Moreover, the IPU provides 
+the actual numbers used to calculate the percentages (which the World Bank does not).
+
+## Data limitations
+
+Take caution when interpreting these data, as parliamentary systems vary from country 
+to country, and in some cases over time. Some of the issues to consider include:
+
+- Who has, and who does not have, the right to become a Member of Parliament (MP)?
+- How does someone become an MP? Through democratic elections? How is "democratic
+election" defined? 
+- What is the real power of MPs and their parliament? Can MPs make a difference?
+
+## Data definitions & assumptions
+
+### "Women"
+
+The definition for “women” is not given, so we will assume that it refers to a 
+binary classification for gender (sex).
+
+### "Country (Region)"
+
+The definition of countries and regions can change over time.  (e.g. formation of new
+countries after conflicts, new member states joining a pre-existing collective). 
+How are these changes reflected in the data? How do they affect the interpretation? 
+
+## Pro tip
+
+Understand the limitations of your data before anybody else points them out to you. 
+
+# About the data file
+
+The data is stored in a file called:
+
+- `API_SG.GEN.PARL.ZS_DS2_en_csv_v2_10473744.csv`
+
+To simplify things we have copied it to `WB-WiP.csv` (which also allows us to 
+maintain the original file in case something goes wrong).
+
+## Pro tip
+
+Always keep a backup copy of the data. Alternatively, set the data file(s) to 
+“read-only” to protect it from being overwritten or modified.
+
+## Exercise
+
+It is important to look at and understand the contents of the file before you start
+using it. Using a text editor or a spreadsheet software, open the `WB-WiP.csv` file
+(in the data directory). What do you observe in the contents of this file?
+
+## Content and Structure
+
+The first four lines of WB-WiP.csv can be ignored, since they contain two lines 
+of meta-information and two blank lines, as follows:
+```{bash first4lines, echo=FALSE, comment=NA}
+head -n 4 ../data/WB-WiP.csv | cat -n |  sed 's/^[[:blank:]]*/ /g'
+```
+
+The fifth line contains the column (variable) names and the body of data starts 
+in the sixth line. It is important to note that there was no collection of data 
+for a majority of the years, which means that it is “missing”.
+
+# Importing the data
+
+Based on our findings above, we can "skip" the first four lines and treat the
+fifth line as column (variable) names. 
+```{r readData, collapse=TRUE}
+library(data.table)
+wip <- fread(here("data", "WB-WiP.csv"), 
+             skip = 4, header = TRUE)
+```
+
+## Exercise
+
+Check what you have read by typing “`wip`” in the console window. What do you 
+observe? Type “`class(wip)`” and “`str(wip)`” to confirm that “`wip`” is of class 
+“`data.table`”. 
+
+## "Fix" column names
+
+Some of the column names contain spaces while others are numeric:
+```{r colNames, collapse=TRUE}
+head(names(wip))
+tail(names(wip))
+```
+By using the `make.names()` function we don't need to use back ticks 
+(`` ` ``) around the column names (e.g. `` `r '\x60col name\x60'` ``).
+```{r fixColNames, collapse=TRUE}
+names(wip) <- make.names(names(wip))
+head(names(wip))
+tail(names(wip))
+```
+
+# Data Wrangling Aims
+
+We can simplify the production of summaries and plots by restructuring the current 
+`wip` dataset (which has `r ncol(wip)` columns) to the following format:
+```
+   Country       Year   pctWiP
+   Country AAA   1997     ##.#
+   Country AAA   1998     ##.#
+   Country AAA   1999     ##.#
+   ...
+```
+pctWiP refers to the percentage of women in parliament.
+
+## Key information retained
+
+These three columns will contain the same information as the `wip` dataset but in
+a more usable format. We will also add a variable for the ratio of male to female MPs.
+
+## Superfluous columns
+
+We will start by removing columns ``r tail(names(wip), n=1)``, `Indicator.Name` and 
+ `Indicator.Code`. There are years without any data but they will be removed 
+ automatically later (when restructuring from "wide" to "long" format).
+
+Column ``r tail(names(wip), n=1)`` is created automatically due to an extra comma 
+at the end of the column names (fifth) line of `WB-WiP.csv`:
+```{bash extraComma, echo=FALSE, comment="   ..."}
+head -n 5 ../data/WB-WiP.csv | tail -n -1 -c 31
+```
+## Check
+
+Before removing it check that all values are `NA`.
+```{r checkV64, collapse=TRUE}
+wip[, .N, by=.(V64)]
+```
+Column `Indicator.Name` has the unique value _"`r unique(wip[, .(Indicator.Name)])`"_ 
+and in `Indicator.Code` it is _"`r unique(wip[, .(Indicator.Code)])`"_. 
+As there is only one indicator in this dataset we will remove these two columns.
+
+## Exercise
+
+Confirm that both `Indicator.Name` and `Indicator.Code` have the same values for
+all observations. Hint: Use the approach above for variable ``r tail(names(wip), n=1)``
+
+## Removing columns
+
+The indicator and ``r tail(names(wip), n=1)`` columns can be removed. We will also 
+rename "`Country.Name`" as "`Country`" and "`Country.Code`" as "`Code`".
+```{r rmCols, collapse=TRUE}
+wip[, c("Indicator.Name", "Indicator.Code", 
+        "V64"):=NULL]
+setnames(wip, c("Country.Name", "Country.Code"), 
+              c("Country", "Code"))
+head(names(wip))
+tail(names(wip))
+```
+
+## Reshape to long format
+
+We want to transform the data so that for each country the year (column) data becomes
+a row. At the same time we will remove the missing data (with the `na.rm` option).
+```{r meltwip, collapse=TRUE, message=FALSE, warning=FALSE}
+WP <- melt(wip,
+           id.vars = c("Country", "Code"),
+           measure = patterns("^X"),
+           variable.name = "YearC",
+           value.name = c("pctWiP"),
+           na.rm = TRUE)
+WP
+```
+
+
+## Final tweaks to `WP`
+
+Create a numeric `Year` variable and a `Ratio` of men to women in parliament.
+```{r finalTweaks, collapse=TRUE}
+WP[, `:=`(Year=as.numeric(gsub("[^[:digit:].]", 
+                               "",  YearC)),
+          Ratio = (100-pctWiP)/pctWiP)][
+            , YearC:=NULL]
+setcolorder(WP, c("Country", "Code", "Year", 
+                  "pctWiP", "Ratio"))
+# Look at the contents of WP
+WP
+```
+
+# Questions
+
+The objective is to look at the geographical and time trends in the data. We will
+answer the following questions.
+
+- What are the time trends for Portugal?
+- How does Portugal compare to other countries?
+- Which countries have the highest percentage of women in parliament by year?
+- How do continents compare?
+- What are the global trends over time?
+
+## Exercise
+
+- Which country do you think has the highest percentage of women in parliament? 
+- In each continent (i.e. Africa, Americas, Asia, Europe and Oceania), which country
+has the highest percentage of women in parliament? 
+- What is the world percentage of women in parliament in `r max(WP$Year)`?
+
+# Exploratory Analysis
+
+## Select a country
+
+This guide explores how Portugal performs over time and compared to other countries. 
+Before continuing, select another country for yourself to repeat the examples and 
+do the exercises.
+
+## Time trends for Portugal
+
+First look at the raw data.
+```{r PTTable}
+WP[Country %in% "Portugal"]
+```
+
+### Visualisation
+
+It is easier to find trends within a plot.
+```{r PTplot, fig.width=3, fig.height=2.3}
+library(ggplot2)
+library(magrittr)
+WP[Country %in% "Portugal"] %>% 
+ggplot(aes(Year, pctWiP)) +
+  geom_line() + geom_point() +
+  scale_y_continuous(limits=c(0, 50)) +
+  ylab("% Women in Parliament")
+```
+
+### Interpretation
+
+In 1990 Portugal had 7.6% women in parliament, which increased to 34.8% in 2018. This
+still falls short of 50% (i.e. point of gender parity in parliament).
+
+## Exercise 
+
+For your chosen country look at the time trend data and the plot. What is your 
+interpretation? How does it compare to Portugal?
+
+## Portugal versus European Union (EU) countries
+
+We selected six EU countries for comparison (due to space limitations). It would 
+be better to compare all EU and/or all European countries.
+```{r euPctPlot, fig.width=3.5, fig.height=3, cache=FALSE}
+WP[Country %in% c("Portugal", "Sweden", "Spain",
+     "Hungary", "Romania", "Finland", "Germany",
+                           "European Union")] %>%
+  ggplot(aes(Year, pctWiP, colour=Country)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_y_continuous(limits=c(0, 50), 
+                     breaks=seq(0, 50, by=10)) +
+  ggtitle("Women in Parliament: EU Countries") +
+  ylab("% Women in Parliament")
+```
+
+### Interpretation
+
+Since 2012 Portugal has had more women in parliament than the European Union average. 
+Hungary and Romania both had a higher percentage of women in parliament in 1990 
+(around the end of the Cold War) than they have had since. The key point to note 
+is that none of these countries reaches equality between males and females in 
+parliament, although Sweden and Finland come closest.
+
+## A couple of points to note
+
+### "Germany"
+
+In October 1990, the process of “German reunification” lead to the creation of 
+Germany, which united the former “German Democratic Republic” (East Germany) and 
+the “Federal Republic of Germany” (West Germany). Therefore, since reunification, 
+the data is presented for the reunified “Germany” only. Careful thought should be 
+given to handling, analysing and interpreting any pre-reunification data (if available).
+
+### "European Union"
+
+The “European Union” has changed over time (unlike the “continent of Europe”). It 
+started in the 1950s as a block of six European countries (known as the “European 
+Community”) and has expanded over the years to 28 countries (with the United Kingdom 
+about to depart). This raises the question of how the European Union average is 
+calculated. For a given year, is it calculated based on the actual member states 
+in that year or on all of the current member states?
+
+## Exercises
+
+Compare the country of your choice to four or five other countries by plotting a 
+line graph similar to the one above. 
+
+## Countries with the highest percentage of women in parliament
+
+A quick answer can be obtained by looking at the highest percentages.
+```{r allTopPct}
+WP[order(-pctWiP), head(.SD, 10)]
+```
+
+## Data speaks
+
+Are you surprised? Data can be very enlightening.
+
+## Highest percentage by year
+
+Which countries have the highest percentage of women in parliament by year?
+```{r allTopPctYear, collapse=TRUE}
+WP[order(Year, -pctWiP), head(.SD, 1), by = Year]
+```
+
+## Merging continent
+
+The variable `Country` in the `WP` dataset is a mix of countries and regions (e.g. 
+"European Union", "South Asia" and "World"). To present the highest percentages 
+grouped by continent we need to add it. Luckily, given the large number of R packages 
+available, we can merge the "`continent`" from the "`codelist`" dataset in the 
+"`countrycode`" package. 
+```{r mergeContinent}
+# Ensure that 'countrycode' package is installed.
+# install.packages("countrycode")
+library(countrycode)
+cl <- as.data.table(codelist)[, .(continent, wb)]
+setnames(cl, c("continent", "wb"), 
+             c("Continent", "Code"))
+cWP <- cl[WP, on="Code"]
+```
+
+## Highest percentages by year and continent
+
+Which countries have the highest percentages in 1990 and 2018?
+```{r allTopPctYearContinent, collapse=TRUE}
+cWP[Year %in% c(1990, 2018) & !is.na(Continent)][
+    order(Year, -pctWiP), head(.SD, 1), 
+    by = .(Year, Continent)][
+    order(Continent, Year), 
+    .(Continent, Year, Country, pctWiP)]
+```
+
+## Decline in percentage
+
+Which countries have had a decline in percentage since their first measurement
+(not always 1990)?
+
+```{r declinePct, collapse=TRUE}
+dWP <- cWP[
+  order(Country, Year), .SD[c(1,.N)], 
+   by=Country][,
+  pctDiff := pctWiP - shift(pctWiP), by=Country][
+  pctDiff<0][
+  order(pctDiff)]
+dWP[!is.na(Continent),
+    .(Country, pctWiP, pctDiff)]
+```
+
+### Visualisation 
+
+We will plot the trend lines for countries with at least a 5% decline. Note that the
+"5%" is arbitrarily selected.
+
+```{r decline5pct, fig.width=3.5, fig.height=2.5}
+# Select the countries to plot
+dclpct <- unique(dWP[!is.na(Continent) &
+                   pctDiff <= -5]$Country)
+
+WP[Country %in% dclpct] %>%
+  ggplot(aes(Year, pctWiP, colour=Country)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_y_continuous(limits=c(0, 40),
+  breaks=seq(0, 40, by=10)) +
+  ggtitle("Women in Parliament: Decline >=5%") +
+  ylab("% Women in Parliament")
+```
+
+### Interpretation
+
+There is a consistent decline between 1990 and 1997 that should be investigated 
+in collaboration with a subject matter expert to understand the potential causes.
+
+## Ranked status
+
+Another way to look at the data is to look at the ranking of countries, which 
+could be done at a global level or by continent. Nonetheless, the results should 
+be interpreted with caution and an understanding of the actual percentages. For 
+example, if most countries were around the 50% mark, rankings could be misleading 
+and subject to random fluctuations.
+
+## Global ranks by year
+
+We will rank the countries by year based on the percentage of women in parliaments. 
+The countries with the highest percentage will be ranked first and the lowest last. 
+A total for the number of countries with data is included as it varies by year.
+```{r globalRank , collapse=TRUE}
+cWP[!is.na(Continent), 
+    `:=`(RankG = rank(-pctWiP), TotalG = .N),
+        by = .(Year)]
+```
+
+## Global ranking -- Portugal
+
+```{r globalRankPT , collapse=TRUE}
+cWP[Country=="Portugal", 
+    .(Country, Year, pctWiP, RankG, TotalG)][
+      order(Year)]
+```
+
+### Interpretation
+
+Portugal has generally been ranked in the first quartile (25%) of countries in 
+the world, with the fluctuations of its ranking subject to random variation. 
+
+## Exercise 
+
+For your chosen country, interpret its ranking over the years. How does it compare 
+to Portugal?
+
+## Continent ranks by year
+
+We will rank the countries by year within a continent based on the percentage of 
+women in parliaments. The countries with the highest percentage will be ranked 
+first and the lowest last. A total for the number of countries with data, within 
+each continent, is included as it varies by year.
+```{r continentRank , collapse=TRUE}
+cWP[!is.na(Continent), 
+    `:=`(RankC = rank(-pctWiP), TotalC = .N),
+        by = .(Continent, Year)]
+```
+## Portugal's ranking in Europe
+
+```{r continentRankPT , collapse=TRUE}
+cWP[Country=="Portugal", 
+    .(Country, Year, pctWiP, RankC, TotalC)][
+      order(Year)]
+```
+
+## Plot of Portugal's ranking in Europe
+
+Below we reproduce the percentage plot to show how Portugal ranks in relation to 
+six other European countries. Note that the highest percentage is ranked first 
+and the lowest last.
+```{r euRankplot, fig.width=3.5, fig.height=2.7}
+cWP[Country %in% c("Portugal", "Sweden", "Spain",
+  "Hungary", "Romania", "Finland", "Germany")] %>%
+  ggplot(aes(Year, RankC, colour=Country)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_y_continuous(limits=c(0, 45), 
+                     breaks=seq(0, 45, by=10)) +
+  ggtitle("Women in Parliament: Ranked") +
+  ylab("Rank in Europe")
+```
+
+### Interpretation
+
+A total of `r nrow(cWP[Continent=="Europe" & Year==1990])` European countries had
+data in 1990, `r nrow(cWP[Continent=="Europe" & Year==1997])` in 1997 and 
+`r nrow(cWP[Continent=="Europe" & Year==2018])` in 2018. Within Europe, Portugal 
+was typically ranked in the second quartile (25-50%) with the fluctuations of 
+its ranking subject to random variation. 
+
+## Exercise 
+
+How does your chosen country rank within its continent?
+
+## Highest rank by year and continent
+
+Which countries have the highest rank in 1990 and 2018? The answer will coincide 
+with the highest percentages (see above).
+
+```{r allTopRankYearContinent, collapse=TRUE, echo=2}
+options(datatable.print.rownames=FALSE)
+cWP[Year %in% c(1990, 2018) & RankC==1][
+    order(Continent, Year), 
+      .(Continent, Year, Country, pctWiP, RankC)]
+options(datatable.print.rownames=TRUE)
+```
+
+## Overall picture
+
+What are the trends globally? There are various regions defined in the World Bank
+data. We can plot them and highlight the world "average".
+
+```{r globalTrends, warning=FALSE, message=FALSE, fig.width=3, fig.height=2.5}
+library(gghighlight)
+cWP[is.na(Continent)] %>%
+  ggplot(aes(Year, pctWiP, group=Country)) +
+  geom_line() +
+  gghighlight(Country=="World", 
+              use_direct_label = FALSE) +
+  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_y_continuous(limits=c(0, 40), 
+                     breaks=seq(0, 40, by=10)) +
+  ggtitle("Women in Parliament: Global Trends") +
+  ylab("% Women in Parliament")
+```
+
+### Interpretation
+
+The grey lines show that regardless of how we define region the general trends
+are upwards. The "World" percentage (black line) increased between 1997 and 2018. 
+In 2018, women in parliament represented 24% (i.e. a ratio of 3.17 men to each woman), 
+which is still less than half the level before gender parity can be claimed.
+
+# Conclusion
+
+This guide presented an analysis of the percentage of women in parliament as a real-life 
+case study for the data.table package. Although the format limited what could be 
+presented, we can conclude that the percentage of women in parliament is increasing 
+but that gender parity in parliaments is still far-off.
+
+There is a lot more that can be said and discussed about the limitations, interpretation 
+and potential impact of this data which the World Bank has nicely [summarised](https://databank.worldbank.org/data/reports.aspx?source=2&type=metadata&series=SG.GEN.PARL.ZS#).[^WBinterpretation] You are strongly encouraged to read their discussion 
+for a more complete understanding.
+
+
+
+
+[^dtref]: For more information on the `data.table` package see http://r-datatable.com/.
+[^wbstats]: The `wbstats` R package (https://cran.r-project.org/web/packages/wbstats/)
+gives access to a  "tidier" version of the World Bank indicator data.
+[^objNote]: The objective could be termed neutrally as "gender trends" but we will 
+keep it per the World Bank data.
+[^CC4]: https://datacatalog.worldbank.org/public-licenses#cc-by.
+[^ipuwebsite]:Inter-Parliamentary Union: https://www.ipu.org/.
+[^WBinterpretation]: https://databank.worldbank.org/data/reports.aspx?source=2&type=metadata&series=SG.GEN.PARL.ZS.

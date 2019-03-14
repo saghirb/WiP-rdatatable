@@ -71,7 +71,7 @@ skip_final_break: true
 bibliography: pinp
 
 # Optional: Enable a 'Draft' watermark on the document
-watermark: true
+watermark: false
 
 # Customize footer, eg by referencing the vignette
 footer_contents: "Women in Parliament -- data.table"

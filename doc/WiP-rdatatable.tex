@@ -84,9 +84,11 @@ You can download materials for this guide from this link:
   \url{https://ilustat.com/shared/WiP-rdatatable.zip}
 \end{itemize}
 
-Unzip the file, which contains the data, this guide and an R markdown
-exercise file. We advise you to work with WiP-Exercise.Rmd. If you are
-using RStudio, you can double click on WiP-dt.Rproj to get started.
+Unzip the file, which contains the data, this guide and an R script
+exercise file. We advise you to work with ``\texttt{WiP-Exercise.R}''
+file to follow the examples and do the exercises. If you are using
+RStudio, you can double click on ``\texttt{WiP-dt.Rproj}'' to get
+started.
 
 \section{Objectives}\label{objectives}
 
@@ -227,6 +229,7 @@ treat the fifth line as column (variable) names.
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(data.table)}
+\KeywordTok{library}\NormalTok{(here)}
 \NormalTok{wip <-}\StringTok{ }\KeywordTok{fread}\NormalTok{(}\KeywordTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"WB-WiP.csv"}\NormalTok{), }
              \DataTypeTok{skip =} \DecValTok{4}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{)}
 \end{Highlighting}

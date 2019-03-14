@@ -126,9 +126,10 @@ You can download materials for this guide from this link:
 
 - [https://ilustat.com/shared/WiP-rdatatable.zip](https://ilustat.com/shared/WiP-rdatatable.zip) 
 
-Unzip the file, which contains the data, this guide and an R markdown exercise file. 
-We advise you to work with WiP-Exercise.Rmd. If you are using RStudio, you can 
-double click on WiP-dt.Rproj to get started. 
+Unzip the file, which contains the data, this guide and an R script exercise file. 
+We advise you to work with "`WiP-Exercise.R`" file to follow the examples and do 
+the exercises. If you are using RStudio, you can double click on "`WiP-dt.Rproj`" 
+to get started. 
 
 # Objectives
 
@@ -226,6 +227,7 @@ Based on our findings above, we can "skip" the first four lines and treat the
 fifth line as column (variable) names. 
 ```{r readData, collapse=TRUE}
 library(data.table)
+library(here)
 wip <- fread(here("data", "WB-WiP.csv"), 
              skip = 4, header = TRUE)
 ```

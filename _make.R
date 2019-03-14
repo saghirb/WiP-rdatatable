@@ -26,6 +26,7 @@ dir.create(here("Share", "data"))
 
 # Populate the Share directories
 file.copy(here("doc", "WiP-rdatatable.pdf"), here("Share"))
+file.copy(here("doc", "WiP-Exercise.R"), here("Share"))
 file.copy(here("data", "WB-WiP.csv"), here("Share", "data"))
 
 # Creating (initialising) an RStudio project

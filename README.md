@@ -1,9 +1,5 @@
 # WiP-rdatatable
 
-**README.md to be finalised**
-- To do:
-    + Prepare Exercise Rmd file
-
 ## Women in Parliament: R `data.table` Case Study
 
 A [six page guide](https://github.com/saghirb/WiP-rdatatable/blob/master/doc/WiP-rdatatable.pdf) 

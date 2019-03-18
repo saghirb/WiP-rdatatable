@@ -24,9 +24,11 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 - [Getting Started in R - Tinyverse Edition](https://github.com/eddelbuettel/gsir-te)
 - [ggplot2](https://ggplot2.tidyverse.org/)
 
-## Annoucements / Publicised 
+## Annoucements
 
-* (https://twitter.com/ilustat/status/1106268429047205889)
+A reminder of source annoucements.
+
+* https://twitter.com/ilustat/status/1106268429047205889
 
 
 ## Acknowledgements

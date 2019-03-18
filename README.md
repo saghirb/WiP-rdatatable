@@ -24,6 +24,11 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 - [Getting Started in R - Tinyverse Edition](https://github.com/eddelbuettel/gsir-te)
 - [ggplot2](https://ggplot2.tidyverse.org/)
 
+## Annoucements / Publicised 
+
+* (https://twitter.com/ilustat/status/1106268429047205889)
+
+
 ## Acknowledgements
 
 Thanks to [Matt Dowle](https://github.com/mattdowle), [Arun Srinivasan](https://github.com/arunsrinivasan) and all the `data.table` [team](https://github.com/orgs/Rdatatable/people) and contributors for such a great package.

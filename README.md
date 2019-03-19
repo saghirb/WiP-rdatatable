@@ -7,7 +7,7 @@ presenting a [`data.table`](https://r-datatable.com/) case study using the [Worl
 ["Women in Parliament"](https://data.worldbank.org/indicator/SG.GEN.PARL.ZS) data.
 
 
-[![`doc/WiP-rdatatable.pdf`](images/WiP-dt-guide-top.png)](https://github.com/saghirb/WiP-rdatatable/blob/master/doc/WiP-rdatatable.pdf)
+[![`doc/WiP-rdatatable.pdf`](images/WiP-dt-guide.png)](https://github.com/saghirb/WiP-rdatatable/blob/master/doc/WiP-rdatatable.pdf)
 
 ## Objectives
 

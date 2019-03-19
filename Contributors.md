@@ -8,3 +8,4 @@ Contributors
 - [Matt Dowle](https://github.com/mattdowle)
 - [Dirk Eddelbuettel](https://github.com/eddelbuettel)
 - Ana Macedo
+- David Mota

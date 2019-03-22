@@ -193,7 +193,7 @@ Understand the limitations of your data before anybody else points them out to y
 
 The data is stored in a file called:
 
-- `API_SG.GEN.PARL.ZS_DS2_en_csv_v2_10473744.csv`
+- ``r list.files(path = here("data"), pattern = "^API")``
 
 To simplify things we have copied it to `WB-WiP.csv` (which also allows us to 
 maintain the original file in case something goes wrong).
@@ -207,7 +207,7 @@ Always keep a backup copy of the data. Alternatively, set the data file(s) to
 
 It is important to look at and understand the contents of the file before you start
 using it. Using a text editor or a spreadsheet software, open the `WB-WiP.csv` file
-(in the data directory). What do you observe in the contents of this file?
+(in the `data` directory). What do you observe in the contents of this file?
 
 ## Content and Structure
 
@@ -387,8 +387,9 @@ ggplot(aes(Year, pctWiP)) +
 
 ### Interpretation
 
-In 1990 Portugal had 7.6% women in parliament, which increased to 34.8% in 2018. This
-still falls short of 50% (i.e. point of gender parity in parliament).
+In 1990 Portugal had 7.6% women in parliament (i.e. 12.2 men for each woman), which 
+increased to 34.8% (i.e. 1.87 men for each woman) in 2018. This still falls short 
+of 50% (i.e. point of gender parity in parliament).
 
 ## Exercise 
 
@@ -397,9 +398,9 @@ interpretation? How does it compare to Portugal?
 
 ## Portugal versus European Union (EU) countries
 
-We selected six EU countries for comparison (due to space limitations). It would 
+We selected six EU countries (due to space limitations) for comparison. It would 
 be better to compare all EU and/or all European countries.
-```{r euPctPlot, fig.width=3.5, fig.height=3, cache=FALSE}
+```{r euPctPlot, fig.width=3.5, fig.height=2.9, cache=FALSE}
 WP[Country %in% c("Portugal", "Sweden", "Spain",
      "Hungary", "Romania", "Finland", "Germany",
                            "European Union")] %>%
@@ -556,14 +557,14 @@ cWP[!is.na(Continent),
 
 ```{r globalRankPT , collapse=TRUE}
 cWP[Country=="Portugal", 
-    .(Country, Year, pctWiP, RankG, TotalG)][
-      order(Year)]
+  .(Country, Year, pctWiP, Ratio, RankG, TotalG)][
+  order(Year)]
 ```
 
 ### Interpretation
 
 Portugal has generally been ranked in the first quartile (25%) of countries in 
-the world, with the fluctuations of its ranking subject to random variation. 
+the world, with the fluctuations of its ranking most likely due to random variation. 
 
 ## Exercise 
 
@@ -585,8 +586,8 @@ cWP[!is.na(Continent),
 
 ```{r continentRankPT , collapse=TRUE}
 cWP[Country=="Portugal", 
-    .(Country, Year, pctWiP, RankC, TotalC)][
-      order(Year)]
+  .(Country, Year, pctWiP, Ratio, RankC, TotalC)][
+  order(Year)]
 ```
 
 ## Plot of Portugal's ranking in Europe
@@ -612,8 +613,8 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
 A total of `r nrow(cWP[Continent=="Europe" & Year==1990])` European countries had
 data in 1990, `r nrow(cWP[Continent=="Europe" & Year==1997])` in 1997 and 
 `r nrow(cWP[Continent=="Europe" & Year==2018])` in 2018. Within Europe, Portugal 
-was typically ranked in the second quartile (25-50%) with the fluctuations of 
-its ranking subject to random variation. 
+was typically ranked in the second quartile (25-50%) with the fluctuations of its 
+ranking most likely due to random variation.
 
 ## Exercise 
 

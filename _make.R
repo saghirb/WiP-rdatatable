@@ -21,7 +21,8 @@ rmarkdown::render(here("doc", "WiP-rdatatable.Rmd"))
 
 # Create zip files to share with participants
 # First empty the share folder and recreate the directory structure.
-unlink(here("Share/*"), recursive = TRUE)
+unlink(here("Share/"), recursive = TRUE, force = TRUE)
+dir.create(here("Share"))
 dir.create(here("Share", "data"))
 
 # Populate the Share directories

@@ -185,7 +185,7 @@ The data is stored in a file called:
 \begin{itemize}
 \tightlist
 \item
-  \texttt{API\_SG.GEN.PARL.ZS\_DS2\_en\_csv\_v2\_10473744.csv}
+  \texttt{API\_SG.GEN.PARL.ZS\_DS2\_en\_csv\_v2\_10515251.csv}
 \end{itemize}
 
 To simplify things we have copied it to \texttt{WB-WiP.csv} (which also
@@ -201,8 +201,8 @@ modified.
 
 It is important to look at and understand the contents of the file
 before you start using it. Using a text editor or a spreadsheet
-software, open the \texttt{WB-WiP.csv} file (in the data directory).
-What do you observe in the contents of this file?
+software, open the \texttt{WB-WiP.csv} file (in the \texttt{data}
+directory). What do you observe in the contents of this file?
 
 \subsection{Content and Structure}\label{content-and-structure}
 
@@ -212,7 +212,7 @@ two lines of meta-information and two blank lines, as follows:
 \begin{verbatim}
  1  ﻿"Data Source","World Development Indicators",
  2  
- 3  "Last Updated Date","2019-01-30",
+ 3  "Last Updated Date","2019-03-21",
  4  
 \end{verbatim}
 
@@ -509,9 +509,10 @@ It is easier to find trends within a plot.
 
 \subsubsection{Interpretation}\label{interpretation}
 
-In 1990 Portugal had 7.6\% women in parliament, which increased to
-34.8\% in 2018. This still falls short of 50\% (i.e.~point of gender
-parity in parliament).
+In 1990 Portugal had 7.6\% women in parliament (i.e.~12.2 men for each
+woman), which increased to 34.8\% (i.e.~1.87 men for each woman) in
+2018. This still falls short of 50\% (i.e.~point of gender parity in
+parliament).
 
 \subsection{Exercise}\label{exercise-4}
 
@@ -521,7 +522,7 @@ is your interpretation? How does it compare to Portugal?
 \subsection{Portugal versus European Union (EU)
 countries}\label{portugal-versus-european-union-eu-countries}
 
-We selected six EU countries for comparison (due to space limitations).
+We selected six EU countries (due to space limitations) for comparison.
 It would be better to compare all EU and/or all European countries.
 
 \begin{Shaded}
@@ -784,41 +785,41 @@ is included as it varies by year.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{cWP[Country}\OperatorTok{==}\StringTok{"Portugal"}\NormalTok{, }
-\NormalTok{    .(Country, Year, pctWiP, RankG, TotalG)][}
-      \KeywordTok{order}\NormalTok{(Year)]}
-\CommentTok{#       Country Year pctWiP RankG TotalG}
-\CommentTok{#   1: Portugal 1990    7.6  66.0    138}
-\CommentTok{#   2: Portugal 1997   13.0  41.5    161}
-\CommentTok{#   3: Portugal 1998   13.0  49.5    163}
-\CommentTok{#   4: Portugal 1999   18.7  24.0    154}
-\CommentTok{#   5: Portugal 2000   17.4  34.0    158}
-\CommentTok{#   6: Portugal 2001   18.7  33.0    168}
-\CommentTok{#   7: Portugal 2002   19.1  41.0    161}
-\CommentTok{#   8: Portugal 2003   19.1  46.0    175}
-\CommentTok{#   9: Portugal 2004   19.1  54.0    182}
-\CommentTok{#  10: Portugal 2005   21.3  45.5    185}
-\CommentTok{#  11: Portugal 2006   21.3  49.5    189}
-\CommentTok{#  12: Portugal 2007   28.3  28.0    188}
-\CommentTok{#  13: Portugal 2008   28.3  28.0    187}
-\CommentTok{#  14: Portugal 2009   27.4  33.0    187}
-\CommentTok{#  15: Portugal 2010   27.4  34.0    187}
-\CommentTok{#  16: Portugal 2011   28.7  31.0    188}
-\CommentTok{#  17: Portugal 2012   28.7  35.0    188}
-\CommentTok{#  18: Portugal 2013   28.7  39.0    186}
-\CommentTok{#  19: Portugal 2014   31.3  35.0    187}
-\CommentTok{#  20: Portugal 2015   34.8  29.0    188}
-\CommentTok{#  21: Portugal 2016   34.8  27.0    191}
-\CommentTok{#  22: Portugal 2017   34.8  28.0    192}
-\CommentTok{#  23: Portugal 2018   34.8  29.0    192}
-\CommentTok{#       Country Year pctWiP RankG TotalG}
+\NormalTok{  .(Country, Year, pctWiP, Ratio, RankG, TotalG)][}
+  \KeywordTok{order}\NormalTok{(Year)]}
+\CommentTok{#       Country Year pctWiP Ratio RankG TotalG}
+\CommentTok{#   1: Portugal 1990    7.6 12.16  66.0    138}
+\CommentTok{#   2: Portugal 1997   13.0  6.69  41.5    161}
+\CommentTok{#   3: Portugal 1998   13.0  6.69  49.5    163}
+\CommentTok{#   4: Portugal 1999   18.7  4.35  24.0    154}
+\CommentTok{#   5: Portugal 2000   17.4  4.75  34.0    158}
+\CommentTok{#   6: Portugal 2001   18.7  4.35  33.0    168}
+\CommentTok{#   7: Portugal 2002   19.1  4.24  41.0    161}
+\CommentTok{#   8: Portugal 2003   19.1  4.24  46.0    175}
+\CommentTok{#   9: Portugal 2004   19.1  4.24  54.0    182}
+\CommentTok{#  10: Portugal 2005   21.3  3.69  45.5    185}
+\CommentTok{#  11: Portugal 2006   21.3  3.69  49.5    189}
+\CommentTok{#  12: Portugal 2007   28.3  2.53  28.0    188}
+\CommentTok{#  13: Portugal 2008   28.3  2.53  28.0    187}
+\CommentTok{#  14: Portugal 2009   27.4  2.65  33.0    187}
+\CommentTok{#  15: Portugal 2010   27.4  2.65  34.0    187}
+\CommentTok{#  16: Portugal 2011   28.7  2.48  31.0    188}
+\CommentTok{#  17: Portugal 2012   28.7  2.48  35.0    188}
+\CommentTok{#  18: Portugal 2013   28.7  2.48  39.0    186}
+\CommentTok{#  19: Portugal 2014   31.3  2.19  35.0    187}
+\CommentTok{#  20: Portugal 2015   34.8  1.87  29.0    188}
+\CommentTok{#  21: Portugal 2016   34.8  1.87  27.0    191}
+\CommentTok{#  22: Portugal 2017   34.8  1.87  28.0    192}
+\CommentTok{#  23: Portugal 2018   34.8  1.87  29.0    192}
+\CommentTok{#       Country Year pctWiP Ratio RankG TotalG}
 \end{Highlighting}
 \end{Shaded}
 
 \subsubsection{Interpretation}\label{interpretation-3}
 
 Portugal has generally been ranked in the first quartile (25\%) of
-countries in the world, with the fluctuations of its ranking subject to
-random variation.
+countries in the world, with the fluctuations of its ranking most likely
+due to random variation.
 
 \subsection{Exercise}\label{exercise-5}
 
@@ -847,33 +848,33 @@ Europe}\label{portugals-ranking-in-europe}
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{cWP[Country}\OperatorTok{==}\StringTok{"Portugal"}\NormalTok{, }
-\NormalTok{    .(Country, Year, pctWiP, RankC, TotalC)][}
-      \KeywordTok{order}\NormalTok{(Year)]}
-\CommentTok{#       Country Year pctWiP RankC TotalC}
-\CommentTok{#   1: Portugal 1990    7.6  22.0     28}
-\CommentTok{#   2: Portugal 1997   13.0  16.5     39}
-\CommentTok{#   3: Portugal 1998   13.0  18.5     37}
-\CommentTok{#   4: Portugal 1999   18.7  12.0     38}
-\CommentTok{#   5: Portugal 2000   17.4  16.0     38}
-\CommentTok{#   6: Portugal 2001   18.7  15.0     41}
-\CommentTok{#   7: Portugal 2002   19.1  15.0     39}
-\CommentTok{#   8: Portugal 2003   19.1  17.0     41}
-\CommentTok{#   9: Portugal 2004   19.1  21.0     42}
-\CommentTok{#  10: Portugal 2005   21.3  20.0     42}
-\CommentTok{#  11: Portugal 2006   21.3  21.0     44}
-\CommentTok{#  12: Portugal 2007   28.3  15.0     44}
-\CommentTok{#  13: Portugal 2008   28.3  13.0     44}
-\CommentTok{#  14: Portugal 2009   27.4  15.0     44}
-\CommentTok{#  15: Portugal 2010   27.4  15.0     44}
-\CommentTok{#  16: Portugal 2011   28.7  14.0     44}
-\CommentTok{#  17: Portugal 2012   28.7  15.0     43}
-\CommentTok{#  18: Portugal 2013   28.7  17.0     43}
-\CommentTok{#  19: Portugal 2014   31.3  16.0     43}
-\CommentTok{#  20: Portugal 2015   34.8  12.0     43}
-\CommentTok{#  21: Portugal 2016   34.8  11.0     43}
-\CommentTok{#  22: Portugal 2017   34.8  12.0     43}
-\CommentTok{#  23: Portugal 2018   34.8  12.0     43}
-\CommentTok{#       Country Year pctWiP RankC TotalC}
+\NormalTok{  .(Country, Year, pctWiP, Ratio, RankC, TotalC)][}
+  \KeywordTok{order}\NormalTok{(Year)]}
+\CommentTok{#       Country Year pctWiP Ratio RankC TotalC}
+\CommentTok{#   1: Portugal 1990    7.6 12.16  22.0     28}
+\CommentTok{#   2: Portugal 1997   13.0  6.69  16.5     39}
+\CommentTok{#   3: Portugal 1998   13.0  6.69  18.5     37}
+\CommentTok{#   4: Portugal 1999   18.7  4.35  12.0     38}
+\CommentTok{#   5: Portugal 2000   17.4  4.75  16.0     38}
+\CommentTok{#   6: Portugal 2001   18.7  4.35  15.0     41}
+\CommentTok{#   7: Portugal 2002   19.1  4.24  15.0     39}
+\CommentTok{#   8: Portugal 2003   19.1  4.24  17.0     41}
+\CommentTok{#   9: Portugal 2004   19.1  4.24  21.0     42}
+\CommentTok{#  10: Portugal 2005   21.3  3.69  20.0     42}
+\CommentTok{#  11: Portugal 2006   21.3  3.69  21.0     44}
+\CommentTok{#  12: Portugal 2007   28.3  2.53  15.0     44}
+\CommentTok{#  13: Portugal 2008   28.3  2.53  13.0     44}
+\CommentTok{#  14: Portugal 2009   27.4  2.65  15.0     44}
+\CommentTok{#  15: Portugal 2010   27.4  2.65  15.0     44}
+\CommentTok{#  16: Portugal 2011   28.7  2.48  14.0     44}
+\CommentTok{#  17: Portugal 2012   28.7  2.48  15.0     43}
+\CommentTok{#  18: Portugal 2013   28.7  2.48  17.0     43}
+\CommentTok{#  19: Portugal 2014   31.3  2.19  16.0     43}
+\CommentTok{#  20: Portugal 2015   34.8  1.87  12.0     43}
+\CommentTok{#  21: Portugal 2016   34.8  1.87  11.0     43}
+\CommentTok{#  22: Portugal 2017   34.8  1.87  12.0     43}
+\CommentTok{#  23: Portugal 2018   34.8  1.87  12.0     43}
+\CommentTok{#       Country Year pctWiP Ratio RankC TotalC}
 \end{Highlighting}
 \end{Shaded}
 
@@ -905,8 +906,8 @@ percentage is ranked first and the lowest last.
 
 A total of 28 European countries had data in 1990, 39 in 1997 and 43 in
 2018. Within Europe, Portugal was typically ranked in the second
-quartile (25-50\%) with the fluctuations of its ranking subject to
-random variation.
+quartile (25-50\%) with the fluctuations of its ranking most likely due
+to random variation.
 
 \subsection{Exercise}\label{exercise-6}
 

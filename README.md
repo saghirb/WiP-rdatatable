@@ -29,6 +29,8 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 A reminder of source annoucements.
 
 * https://twitter.com/ilustat/status/1106268429047205889
+* https://rweekly.org/2019-12.html#Highlight 
+* https://rweekly.org/2019-12.html#RintheRealWorld
 
 
 ## Acknowledgements

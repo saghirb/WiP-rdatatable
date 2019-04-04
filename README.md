@@ -27,7 +27,7 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 
 ## Cross References
 
-There is a **tidyverse version** of this guide and repository available at:
+There is also a **tidyverse version** of this guide and repository available at:
 
 + [Women in Parliament: R `tidyverse` Case Study](https://github.com/saghirb/WiP-tidyverse).
 

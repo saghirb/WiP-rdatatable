@@ -27,11 +27,11 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 
 ## Cross References
 
-*Tidyverse Version*
+There is a **tidyverse version** of this guide and repository available at:
 
-+ There is a tidyverse version of this guide available at [Women in Parliament: R `tidyverse` Case Study](https://github.com/saghirb/WiP-tidyverse).
++ [Women in Parliament: R `tidyverse` Case Study](https://github.com/saghirb/WiP-tidyverse).
 
-If you would like to teach an introduction to `data.table`, then you can use:
+If you would like to **teach an introduction to `data.table`**, then the following is for you:
 
 + [Repsitory of teaching materials for "Getting Started in R - Tinyverse Edition" workshop](https://github.com/saghirb/R-datatable-Intro).
 

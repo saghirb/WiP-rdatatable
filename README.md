@@ -24,6 +24,17 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 - [Getting Started in R - Tinyverse Edition](https://github.com/eddelbuettel/gsir-te)
 - [ggplot2](https://ggplot2.tidyverse.org/)
 
+
+## Cross References
+
+*Tidyverse Version*
+
++ There is a tidyverse version of this guide available at [Women in Parliament: R `tidyverse` Case Study](https://github.com/saghirb/WiP-tidyverse).
+
+If you would like to teach an introduction to `data.table`, then you can use:
+
++ [Repsitory of teaching materials for "Getting Started in R - Tinyverse Edition" workshop](https://github.com/saghirb/R-datatable-Intro).
+
 ## Annoucements
 
 A reminder of source annoucements.

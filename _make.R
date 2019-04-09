@@ -6,7 +6,8 @@ here()
 
 # Download the zipped data file and extract the files to the "data/" directory.
 # First empty the "share"data/ folder and recreate the directory structure.
-unlink(here("data/*"), recursive = TRUE)
+unlink(here("data/"), recursive = TRUE, force = TRUE) 
+dir.create(here("data"))
 
 tmpZip <- tempfile()
 download.file("http://api.worldbank.org/v2/en/indicator/SG.GEN.PARL.ZS?downloadformat=csv",

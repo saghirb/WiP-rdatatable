@@ -350,7 +350,7 @@ answer the following questions.
 - How do continents compare?
 - What are the global trends over time?
 
-## Exercise
+## Exercise - Without Programming
 
 - Which country do you think has the highest percentage of women in parliament? 
 - In each continent (i.e. Africa, Americas, Asia, Europe and Oceania), which country
@@ -416,7 +416,7 @@ WP[Country %in% c("Portugal", "Sweden", "Spain",
 
 ### Interpretation
 
-Since 2012 Portugal has had more women in parliament than the European Union average. 
+Since 2007 Portugal has had more women in parliament than the European Union average. 
 Hungary and Romania both had a higher percentage of women in parliament in 1990 
 (around the end of the Cold War) than they have had since. The key point to note 
 is that none of these countries reaches equality between males and females in 

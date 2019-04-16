@@ -66,7 +66,8 @@ preparation for some exploratory analysis.
 % If your first paragraph (i.e. with the \dropcap) contains a list environment (quote, quotation, theorem, definition, enumerate, itemize...), the line after the list may have some extra indentation. If this is the case, add \parshape=0 to the end of the list environment.
 
 
-\section{Preface}\label{preface}
+\hypertarget{preface}{%
+\section{Preface}\label{preface}}
 
 We present a real-life case study for the data.table\footnote{For more
   information on the \texttt{data.table} package see
@@ -74,7 +75,8 @@ We present a real-life case study for the data.table\footnote{For more
 in Parliament'' indicator data. To get the most out of this case-study
 guide, repeat the examples and do the exercises whilst reading it.
 
-\subsection{Guide materials}\label{guide-materials}
+\hypertarget{guide-materials}{%
+\subsection{Guide materials}\label{guide-materials}}
 
 You can download materials for this guide from this link:
 
@@ -90,16 +92,19 @@ file to follow the examples and do the exercises. If you are using
 RStudio, you can double click on ``\texttt{WiP-dt.Rproj}'' to get
 started.
 
-\section{Objectives}\label{objectives}
+\hypertarget{objectives}{%
+\section{Objectives}\label{objectives}}
 
 \emph{Explore the geographical and time trends for the percentage of
 women\footnote{The objective could be termed neutrally as ``gender
   trends'' but we will keep it per the World Bank data.} in national
 parliaments.}
 
-\section{Understanding the Data}\label{understanding-the-data}
+\hypertarget{understanding-the-data}{%
+\section{Understanding the Data}\label{understanding-the-data}}
 
-\subsection{The World Bank Data}\label{the-world-bank-data}
+\hypertarget{the-world-bank-data}{%
+\subsection{The World Bank Data}\label{the-world-bank-data}}
 
 The raw data for \emph{``Proportion of seats held by women in national
 parliaments''} includes the percentage of women in parliament
@@ -119,7 +124,8 @@ As part of its ``open data'' mission the World Bank offers \emph{``free
 and open access to global development data''} kindly licensed under the
 ``Creative Commons Attribution 4.0 (CC-BY 4.0)''.\footnote{\url{https://datacatalog.worldbank.org/public-licenses\#cc-by}.}
 
-\subsection{Source Data}\label{source-data}
+\hypertarget{source-data}{%
+\subsection{Source Data}\label{source-data}}
 
 The data originates from the ``Inter-Parliamentary Union''
 (IPU)\footnote{Inter-Parliamentary Union: \url{https://www.ipu.org/}.}
@@ -138,7 +144,8 @@ only'', while the IPU also presents data for ``Upper Houses or
 Senates''. Moreover, the IPU provides the actual numbers used to
 calculate the percentages (which the World Bank does not).
 
-\subsection{Data limitations}\label{data-limitations}
+\hypertarget{data-limitations}{%
+\subsection{Data limitations}\label{data-limitations}}
 
 Take caution when interpreting these data, as parliamentary systems vary
 from country to country, and in some cases over time. Some of the issues
@@ -157,28 +164,32 @@ to consider include:
   difference?
 \end{itemize}
 
+\hypertarget{data-definitions-assumptions}{%
 \subsection{Data definitions \&
-assumptions}\label{data-definitions-assumptions}
+assumptions}\label{data-definitions-assumptions}}
 
-\subsubsection{\texorpdfstring{``Women''}{Women}}\label{women}
+\hypertarget{women}{%
+\subsubsection{``Women''}\label{women}}
 
 The definition for ``women'' is not given, so we will assume that it
 refers to a binary classification for gender (sex).
 
-\subsubsection{\texorpdfstring{``Country
-(Region)''}{Country (Region)}}\label{country-region}
+\hypertarget{country-region}{%
+\subsubsection{``Country (Region)''}\label{country-region}}
 
 The definition of countries and regions can change over time.
 (e.g.~formation of new countries after conflicts, new member states
 joining a pre-existing collective). How are these changes reflected in
 the data? How do they affect the interpretation?
 
-\subsection{Pro tip}\label{pro-tip}
+\hypertarget{pro-tip}{%
+\subsection{Pro tip}\label{pro-tip}}
 
 Understand the limitations of your data before anybody else points them
 out to you.
 
-\section{About the data file}\label{about-the-data-file}
+\hypertarget{about-the-data-file}{%
+\section{About the data file}\label{about-the-data-file}}
 
 The data is stored in a file called:
 
@@ -191,20 +202,23 @@ The data is stored in a file called:
 To simplify things we have copied it to \texttt{WB-WiP.csv} (which also
 allows us to maintain the original file in case something goes wrong).
 
-\subsection{Pro tip}\label{pro-tip-1}
+\hypertarget{pro-tip-1}{%
+\subsection{Pro tip}\label{pro-tip-1}}
 
 Always keep a backup copy of the data. Alternatively, set the data
 file(s) to ``read-only'' to protect it from being overwritten or
 modified.
 
-\subsection{Exercise}\label{exercise}
+\hypertarget{exercise}{%
+\subsection{Exercise}\label{exercise}}
 
 It is important to look at and understand the contents of the file
 before you start using it. Using a text editor or a spreadsheet
 software, open the \texttt{WB-WiP.csv} file (in the \texttt{data}
 directory). What do you observe in the contents of this file?
 
-\subsection{Content and Structure}\label{content-and-structure}
+\hypertarget{content-and-structure}{%
+\subsection{Content and Structure}\label{content-and-structure}}
 
 The first four lines of WB-WiP.csv can be ignored, since they contain
 two lines of meta-information and two blank lines, as follows:
@@ -221,7 +235,8 @@ starts in the sixth line. It is important to note that there was no
 collection of data for a majority of the years, which means that it is
 ``missing''.
 
-\section{Importing the data}\label{importing-the-data}
+\hypertarget{importing-the-data}{%
+\section{Importing the data}\label{importing-the-data}}
 
 Based on our findings above, we can ``skip'' the first four lines and
 treat the fifth line as column (variable) names.
@@ -235,15 +250,16 @@ treat the fifth line as column (variable) names.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Exercise}\label{exercise-1}
+\hypertarget{exercise-1}{%
+\subsection{Exercise}\label{exercise-1}}
 
 Check what you have read by typing ``\texttt{wip}'' in the console
 window. What do you observe? Type ``\texttt{class(wip)}'' and
 ``\texttt{str(wip)}'' to confirm that ``\texttt{wip}'' is of class
 ``\texttt{data.table}''.
 
-\subsection{\texorpdfstring{``Fix'' column
-names}{Fix column names}}\label{fix-column-names}
+\hypertarget{fix-column-names}{%
+\subsection{``Fix'' column names}\label{fix-column-names}}
 
 Some of the column names contain spaces while others are numeric:
 
@@ -275,7 +291,8 @@ ticks (\texttt{\textasciigrave{}}) around the column names (e.g.
 \end{Highlighting}
 \end{Shaded}
 
-\section{Data Wrangling Aims}\label{data-wrangling-aims}
+\hypertarget{data-wrangling-aims}{%
+\section{Data Wrangling Aims}\label{data-wrangling-aims}}
 
 We can simplify the production of summaries and plots by restructuring
 the current \texttt{wip} dataset (which has 64 columns) to the following
@@ -291,13 +308,15 @@ format:
 
 pctWiP refers to the percentage of women in parliament.
 
-\subsection{Key information retained}\label{key-information-retained}
+\hypertarget{key-information-retained}{%
+\subsection{Key information retained}\label{key-information-retained}}
 
 These three columns will contain the same information as the
 \texttt{wip} dataset but in a more usable format. We will also add a
 variable for the ratio of male to female MPs.
 
-\subsection{Superfluous columns}\label{superfluous-columns}
+\hypertarget{superfluous-columns}{%
+\subsection{Superfluous columns}\label{superfluous-columns}}
 
 We will start by removing columns \texttt{V64}, \texttt{Indicator.Name}
 and \texttt{Indicator.Code}. There are years without any data but they
@@ -311,7 +330,8 @@ the end of the column names (fifth) line of \texttt{WB-WiP.csv}:
    ... ,"2015","2016","2017","2018",
 \end{verbatim}
 
-\subsection{Check}\label{check}
+\hypertarget{check}{%
+\subsection{Check}\label{check}}
 
 Before removing it check that all values are \texttt{NA}.
 
@@ -328,13 +348,15 @@ of seats held by women in national parliaments (\%)''} and in
 \texttt{Indicator.Code} it is \emph{``SG.GEN.PARL.ZS''}. As there is
 only one indicator in this dataset we will remove these two columns.
 
-\subsection{Exercise}\label{exercise-2}
+\hypertarget{exercise-2}{%
+\subsection{Exercise}\label{exercise-2}}
 
 Confirm that both \texttt{Indicator.Name} and \texttt{Indicator.Code}
 have the same values for all observations. Hint: Use the approach above
 for variable \texttt{V64}
 
-\subsection{Removing columns}\label{removing-columns}
+\hypertarget{removing-columns}{%
+\subsection{Removing columns}\label{removing-columns}}
 
 The indicator and \texttt{V64} columns can be removed. We will also
 rename ``\texttt{Country.Name}'' as ``\texttt{Country}'' and
@@ -355,7 +377,8 @@ rename ``\texttt{Country.Name}'' as ``\texttt{Country}'' and
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Reshape to long format}\label{reshape-to-long-format}
+\hypertarget{reshape-to-long-format}{%
+\subsection{Reshape to long format}\label{reshape-to-long-format}}
 
 We want to transform the data so that for each country the year (column)
 data becomes a row. At the same time we will remove the missing data
@@ -383,8 +406,9 @@ data becomes a row. At the same time we will remove the missing data
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{final-tweaks-to-wp}{%
 \subsection{\texorpdfstring{Final tweaks to
-\texttt{WP}}{Final tweaks to WP}}\label{final-tweaks-to-wp}
+\texttt{WP}}{Final tweaks to WP}}\label{final-tweaks-to-wp}}
 
 Create a numeric \texttt{Year} variable and a \texttt{Ratio} of men to
 women in parliament.
@@ -412,7 +436,8 @@ women in parliament.
 \end{Highlighting}
 \end{Shaded}
 
-\section{Questions}\label{questions}
+\hypertarget{questions}{%
+\section{Questions}\label{questions}}
 
 The objective is to look at the geographical and time trends in the
 data. We will answer the following questions.
@@ -432,7 +457,9 @@ data. We will answer the following questions.
   What are the global trends over time?
 \end{itemize}
 
-\subsection{Exercise}\label{exercise-3}
+\hypertarget{exercise---without-programming}{%
+\subsection{Exercise - Without
+Programming}\label{exercise---without-programming}}
 
 \begin{itemize}
 \tightlist
@@ -446,15 +473,18 @@ data. We will answer the following questions.
   What is the world percentage of women in parliament in 2018?
 \end{itemize}
 
-\section{Exploratory Analysis}\label{exploratory-analysis}
+\hypertarget{exploratory-analysis}{%
+\section{Exploratory Analysis}\label{exploratory-analysis}}
 
-\subsection{Select a country}\label{select-a-country}
+\hypertarget{select-a-country}{%
+\subsection{Select a country}\label{select-a-country}}
 
 This guide explores how Portugal performs over time and compared to
 other countries. Before continuing, select another country for yourself
 to repeat the examples and do the exercises.
 
-\subsection{Time trends for Portugal}\label{time-trends-for-portugal}
+\hypertarget{time-trends-for-portugal}{%
+\subsection{Time trends for Portugal}\label{time-trends-for-portugal}}
 
 First look at the raw data.
 
@@ -489,7 +519,8 @@ First look at the raw data.
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Visualisation}\label{visualisation}
+\hypertarget{visualisation}{%
+\subsubsection{Visualisation}\label{visualisation}}
 
 It is easier to find trends within a plot.
 
@@ -507,20 +538,23 @@ It is easier to find trends within a plot.
 
 \begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/PTplot-1} \end{center}
 
-\subsubsection{Interpretation}\label{interpretation}
+\hypertarget{interpretation}{%
+\subsubsection{Interpretation}\label{interpretation}}
 
 In 1990 Portugal had 7.6\% women in parliament (i.e.~12.2 men for each
 woman), which increased to 34.8\% (i.e.~1.87 men for each woman) in
 2018. This still falls short of 50\% (i.e.~point of gender parity in
 parliament).
 
-\subsection{Exercise}\label{exercise-4}
+\hypertarget{exercise-3}{%
+\subsection{Exercise}\label{exercise-3}}
 
 For your chosen country look at the time trend data and the plot. What
 is your interpretation? How does it compare to Portugal?
 
+\hypertarget{portugal-versus-european-union-eu-countries}{%
 \subsection{Portugal versus European Union (EU)
-countries}\label{portugal-versus-european-union-eu-countries}
+countries}\label{portugal-versus-european-union-eu-countries}}
 
 We selected six EU countries (due to space limitations) for comparison.
 It would be better to compare all EU and/or all European countries.
@@ -543,19 +577,22 @@ It would be better to compare all EU and/or all European countries.
 
 \begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/euPctPlot-1} \end{center}
 
-\subsubsection{Interpretation}\label{interpretation-1}
+\hypertarget{interpretation-1}{%
+\subsubsection{Interpretation}\label{interpretation-1}}
 
-Since 2012 Portugal has had more women in parliament than the European
+Since 2007 Portugal has had more women in parliament than the European
 Union average. Hungary and Romania both had a higher percentage of women
 in parliament in 1990 (around the end of the Cold War) than they have
 had since. The key point to note is that none of these countries reaches
 equality between males and females in parliament, although Sweden and
 Finland come closest.
 
+\hypertarget{a-couple-of-points-to-note}{%
 \subsection{A couple of points to
-note}\label{a-couple-of-points-to-note}
+note}\label{a-couple-of-points-to-note}}
 
-\subsubsection{\texorpdfstring{``Germany''}{Germany}}\label{germany}
+\hypertarget{germany}{%
+\subsubsection{``Germany''}\label{germany}}
 
 In October 1990, the process of ``German reunification'' lead to the
 creation of Germany, which united the former ``German Democratic
@@ -564,8 +601,8 @@ Germany). Therefore, since reunification, the data is presented for the
 reunified ``Germany'' only. Careful thought should be given to handling,
 analysing and interpreting any pre-reunification data (if available).
 
-\subsubsection{\texorpdfstring{``European
-Union''}{European Union}}\label{european-union}
+\hypertarget{european-union}{%
+\subsubsection{``European Union''}\label{european-union}}
 
 The ``European Union'' has changed over time (unlike the ``continent of
 Europe''). It started in the 1950s as a block of six European countries
@@ -575,13 +612,15 @@ question of how the European Union average is calculated. For a given
 year, is it calculated based on the actual member states in that year or
 on all of the current member states?
 
-\subsection{Exercises}\label{exercises}
+\hypertarget{exercises}{%
+\subsection{Exercises}\label{exercises}}
 
 Compare the country of your choice to four or five other countries by
 plotting a line graph similar to the one above.
 
+\hypertarget{countries-with-the-highest-percentage-of-women-in-parliament}{%
 \subsection{Countries with the highest percentage of women in
-parliament}\label{countries-with-the-highest-percentage-of-women-in-parliament}
+parliament}\label{countries-with-the-highest-percentage-of-women-in-parliament}}
 
 A quick answer can be obtained by looking at the highest percentages.
 
@@ -602,12 +641,14 @@ A quick answer can be obtained by looking at the highest percentages.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Data speaks}\label{data-speaks}
+\hypertarget{data-speaks}{%
+\subsection{Data speaks}\label{data-speaks}}
 
 Are you surprised? Data can be very enlightening.
 
+\hypertarget{highest-percentage-by-year}{%
 \subsection{Highest percentage by
-year}\label{highest-percentage-by-year}
+year}\label{highest-percentage-by-year}}
 
 Which countries have the highest percentage of women in parliament by
 year?
@@ -643,7 +684,8 @@ year?
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Merging continent}\label{merging-continent}
+\hypertarget{merging-continent}{%
+\subsection{Merging continent}\label{merging-continent}}
 
 The variable \texttt{Country} in the \texttt{WP} dataset is a mix of
 countries and regions (e.g. ``European Union'', ``South Asia'' and
@@ -664,8 +706,9 @@ dataset in the ``\texttt{countrycode}'' package.
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{highest-percentages-by-year-and-continent}{%
 \subsection{Highest percentages by year and
-continent}\label{highest-percentages-by-year-and-continent}
+continent}\label{highest-percentages-by-year-and-continent}}
 
 Which countries have the highest percentages in 1990 and 2018?
 
@@ -690,7 +733,8 @@ Which countries have the highest percentages in 1990 and 2018?
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Decline in percentage}\label{decline-in-percentage}
+\hypertarget{decline-in-percentage}{%
+\subsection{Decline in percentage}\label{decline-in-percentage}}
 
 Which countries have had a decline in percentage since their first
 measurement (not always 1990)?
@@ -726,7 +770,8 @@ measurement (not always 1990)?
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Visualisation}\label{visualisation-1}
+\hypertarget{visualisation-1}{%
+\subsubsection{Visualisation}\label{visualisation-1}}
 
 We will plot the trend lines for countries with at least a 5\% decline.
 Note that the ``5\%'' is arbitrarily selected.
@@ -735,7 +780,7 @@ Note that the ``5\%'' is arbitrarily selected.
 \begin{Highlighting}[]
 \CommentTok{# Select the countries to plot}
 \NormalTok{dclpct <-}\StringTok{ }\KeywordTok{unique}\NormalTok{(dWP[}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(Continent) }\OperatorTok{&}
-\StringTok{                   }\NormalTok{pctDiff }\OperatorTok{<=}\StringTok{ }\OperatorTok{-}\DecValTok{5}\NormalTok{]}\OperatorTok{$}\NormalTok{Country)}
+\StringTok{                   }\NormalTok{pctDiff }\OperatorTok{<=}\StringTok{ }\DecValTok{-5}\NormalTok{]}\OperatorTok{$}\NormalTok{Country)}
 
 \NormalTok{WP[Country }\OperatorTok{%in%}\StringTok{ }\NormalTok{dclpct] }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Year, pctWiP, }\DataTypeTok{colour=}\NormalTok{Country)) }\OperatorTok{+}
@@ -751,13 +796,15 @@ Note that the ``5\%'' is arbitrarily selected.
 
 \begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/decline5pct-1} \end{center}
 
-\subsubsection{Interpretation}\label{interpretation-2}
+\hypertarget{interpretation-2}{%
+\subsubsection{Interpretation}\label{interpretation-2}}
 
 There is a consistent decline between 1990 and 1997 that should be
 investigated in collaboration with a subject matter expert to understand
 the potential causes.
 
-\subsection{Ranked status}\label{ranked-status}
+\hypertarget{ranked-status}{%
+\subsection{Ranked status}\label{ranked-status}}
 
 Another way to look at the data is to look at the ranking of countries,
 which could be done at a global level or by continent. Nonetheless, the
@@ -765,7 +812,8 @@ results should be interpreted with caution and an understanding of the
 actual percentages. For example, if most countries were around the 50\%
 mark, rankings could be misleading and subject to random fluctuations.
 
-\subsection{Global ranks by year}\label{global-ranks-by-year}
+\hypertarget{global-ranks-by-year}{%
+\subsection{Global ranks by year}\label{global-ranks-by-year}}
 
 We will rank the countries by year based on the percentage of women in
 parliaments. The countries with the highest percentage will be ranked
@@ -780,7 +828,8 @@ is included as it varies by year.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Global ranking -- Portugal}\label{global-ranking-portugal}
+\hypertarget{global-ranking-portugal}{%
+\subsection{Global ranking -- Portugal}\label{global-ranking-portugal}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -815,18 +864,21 @@ is included as it varies by year.
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Interpretation}\label{interpretation-3}
+\hypertarget{interpretation-3}{%
+\subsubsection{Interpretation}\label{interpretation-3}}
 
 Portugal has generally been ranked in the first quartile (25\%) of
 countries in the world, with the fluctuations of its ranking most likely
 due to random variation.
 
-\subsection{Exercise}\label{exercise-5}
+\hypertarget{exercise-4}{%
+\subsection{Exercise}\label{exercise-4}}
 
 For your chosen country, interpret its ranking over the years. How does
 it compare to Portugal?
 
-\subsection{Continent ranks by year}\label{continent-ranks-by-year}
+\hypertarget{continent-ranks-by-year}{%
+\subsection{Continent ranks by year}\label{continent-ranks-by-year}}
 
 We will rank the countries by year within a continent based on the
 percentage of women in parliaments. The countries with the highest
@@ -842,8 +894,9 @@ varies by year.
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{portugals-ranking-in-europe}{%
 \subsection{Portugal's ranking in
-Europe}\label{portugals-ranking-in-europe}
+Europe}\label{portugals-ranking-in-europe}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -878,8 +931,9 @@ Europe}\label{portugals-ranking-in-europe}
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{plot-of-portugals-ranking-in-europe}{%
 \subsection{Plot of Portugal's ranking in
-Europe}\label{plot-of-portugals-ranking-in-europe}
+Europe}\label{plot-of-portugals-ranking-in-europe}}
 
 Below we reproduce the percentage plot to show how Portugal ranks in
 relation to six other European countries. Note that the highest
@@ -902,19 +956,22 @@ percentage is ranked first and the lowest last.
 
 \begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/euRankplot-1} \end{center}
 
-\subsubsection{Interpretation}\label{interpretation-4}
+\hypertarget{interpretation-4}{%
+\subsubsection{Interpretation}\label{interpretation-4}}
 
 A total of 28 European countries had data in 1990, 39 in 1997 and 43 in
 2018. Within Europe, Portugal was typically ranked in the second
 quartile (25-50\%) with the fluctuations of its ranking most likely due
 to random variation.
 
-\subsection{Exercise}\label{exercise-6}
+\hypertarget{exercise-5}{%
+\subsection{Exercise}\label{exercise-5}}
 
 How does your chosen country rank within its continent?
 
+\hypertarget{highest-rank-by-year-and-continent}{%
 \subsection{Highest rank by year and
-continent}\label{highest-rank-by-year-and-continent}
+continent}\label{highest-rank-by-year-and-continent}}
 
 Which countries have the highest rank in 1990 and 2018? The answer will
 coincide with the highest percentages (see above).
@@ -938,7 +995,8 @@ coincide with the highest percentages (see above).
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Overall picture}\label{overall-picture}
+\hypertarget{overall-picture}{%
+\subsection{Overall picture}\label{overall-picture}}
 
 What are the trends globally? There are various regions defined in the
 World Bank data. We can plot them and highlight the world ``average''.
@@ -961,7 +1019,8 @@ World Bank data. We can plot them and highlight the world ``average''.
 
 \begin{center}\includegraphics{WiP-rdatatable_files/figure-latex/globalTrends-1} \end{center}
 
-\subsubsection{Interpretation}\label{interpretation-5}
+\hypertarget{interpretation-5}{%
+\subsubsection{Interpretation}\label{interpretation-5}}
 
 The grey lines show that regardless of how we define region the general
 trends are upwards. The ``World'' percentage (black line) increased
@@ -969,7 +1028,8 @@ between 1997 and 2018. In 2018, women in parliament represented 24\%
 (i.e.~a ratio of 3.17 men to each woman), which is still less than half
 the level before gender parity can be claimed.
 
-\section{Conclusion}\label{conclusion}
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
 
 This guide presented an analysis of the percentage of women in
 parliament as a real-life case study for the data.table package.

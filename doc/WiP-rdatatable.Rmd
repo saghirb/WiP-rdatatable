@@ -114,6 +114,11 @@ update_geom_defaults("point", list(size = 0.5))
 update_geom_defaults("boxplot", list(outlier.size = 0.5))
 ```
 
+\begin{tikzpicture}[remember picture, overlay]
+    \node [shift={(-2cm,-2cm)}]  at (current page.north east)
+        {\includegraphics[width=2.5cm]{../images/Women_in_Parliament_hex.png}};
+\end{tikzpicture}
+
 # Preface
 
 We present a real-life case study for the data.table[^dtref] package using the 
@@ -657,6 +662,9 @@ There is a lot more that can be said and discussed about the limitations, interp
 and potential impact of this data which the World Bank has nicely [summarised](https://databank.worldbank.org/data/reports.aspx?source=2&type=metadata&series=SG.GEN.PARL.ZS#).[^WBinterpretation] You are strongly encouraged to read their discussion 
 for a more complete understanding.
 
+```{r addWiPrect, echo=FALSE, out.width="100%"}
+include_graphics(here("images", "Women_in_Parliament_rect.png"))
+```
 
 
 [^dtref]: For more information on the `data.table` package see http://r-datatable.com/.

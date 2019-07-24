@@ -27,18 +27,8 @@ update_geom_defaults("boxplot", list(outlier.size = 0.5))
 library(data.table)
 library(here)
 wip <- fread(here("data", "WB-WiP.csv"), 
-             skip = 4, header = TRUE)
-
-
-## ----colNames, collapse=TRUE---------------------------------------------
-head(names(wip))
-tail(names(wip))
-
-
-## ----fixColNames, collapse=TRUE------------------------------------------
-names(wip) <- make.names(names(wip))
-head(names(wip))
-tail(names(wip))
+             skip = 4, header = TRUE,
+             check.names = TRUE)
 
 
 ## head -n 5 ../data/WB-WiP.csv | tail -n -1 -c 31
@@ -216,4 +206,8 @@ cWP[is.na(Continent)] %>%
                      breaks=seq(0, 40, by=10)) +
   ggtitle("Women in Parliament: Global Trends") +
   ylab("% Women in Parliament")
+
+
+## ----addWiPrect, echo=FALSE, out.width="100%"----------------------------
+include_graphics(here("images", "Women_in_Parliament_rect.png"))
 

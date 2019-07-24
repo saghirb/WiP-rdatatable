@@ -2,11 +2,16 @@
 
 # Setup
 library(here)
+library(pdftools)
+library(magick)
+library(magrittr)
+
+# Confirm directory location
 here()
 
 # Download the zipped data file and extract the files to the "data/" directory.
 # First empty the "share"data/ folder and recreate the directory structure.
-unlink(here("data/"), recursive = TRUE, force = TRUE) 
+unlink(here("data/"), recursive = TRUE, force = TRUE)
 dir.create(here("data"))
 
 tmpZip <- tempfile()
@@ -19,6 +24,20 @@ file.copy(here("data", WiPDataFile), here("data", "WB-WiP.csv"))
 
 # Render the guide and produce the zip file for distribution.
 rmarkdown::render(here("doc", "WiP-rdatatable.Rmd"))
+
+# Create an image for the README.md file
+  tempPNGs <- paste0("images/temp-", 1:2, ".png")
+  pdf_convert(here("doc", "WiP-rdatatable.pdf"), "png", pages = 1:2,
+              filenames = tempPNGs)
+
+  img1 <- image_read(tempPNGs[1])
+  img2 <- image_read(tempPNGs[2])
+
+  image_append(c(image_border(img1, geometry = "5x5"),
+                 image_border(img2, geometry = "5x5"))) %>%
+    image_write(.,path=here("images", "WiP-dt-guide.png"), format="png")
+
+  file.remove(tempPNGs)
 
 # Extract the R code from Rmd file
 knitr::purl(here("doc", "WiP-rdatatable.Rmd"), output=here("R", "WiP-rdatatable.R"))

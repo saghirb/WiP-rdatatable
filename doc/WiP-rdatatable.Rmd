@@ -224,12 +224,14 @@ for a majority of the years, which means that it is “missing”.
 # Importing the data
 
 Based on our findings above, we can "skip" the first four lines and treat the
-fifth line as column (variable) names. 
+fifth line as column (variable) names. Also note the use of the `check.names`
+argument to ensure that the column names are compliant in R.
 ```{r readData, collapse=TRUE}
 library(data.table)
 library(here)
 wip <- fread(here("data", "WB-WiP.csv"), 
-             skip = 4, header = TRUE)
+             skip = 4, header = TRUE,
+             check.names = TRUE)
 ```
 
 ## Exercise
@@ -237,21 +239,6 @@ wip <- fread(here("data", "WB-WiP.csv"),
 Check what you have read by typing “`wip`” in the console window. What do you 
 observe? Type “`class(wip)`” and “`str(wip)`” to confirm that “`wip`” is of class 
 “`data.table`”. 
-
-## "Fix" column names
-
-Some of the column names contain spaces while others are numeric:
-```{r colNames, collapse=TRUE}
-head(names(wip))
-tail(names(wip))
-```
-By using the `make.names()` function we don't need to use back ticks 
-(`` ` ``) around the column names (e.g. `` `r '\x60col name\x60'` ``).
-```{r fixColNames, collapse=TRUE}
-names(wip) <- make.names(names(wip))
-head(names(wip))
-tail(names(wip))
-```
 
 # Data Wrangling Aims
 

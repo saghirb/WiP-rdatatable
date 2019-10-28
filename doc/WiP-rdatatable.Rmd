@@ -630,13 +630,13 @@ options(datatable.print.rownames=TRUE)
 What are the trends globally? There are various regions defined in the World Bank
 data. We can plot them and highlight the world "average".
 
-```{r globalTrends, warning=FALSE, message=FALSE, fig.width=3, fig.height=2.5}
+```{r globalTrends, message=FALSE, fig.width=3, fig.height=2.5}
 library(gghighlight)
 cWP[is.na(Continent)] %>%
   ggplot(aes(Year, pctWiP, group=Country)) +
   geom_line() +
   gghighlight(Country=="World", 
-              use_direct_label = FALSE) +
+              use_direct_label = FALSE, use_group_by = FALSE) +
   scale_x_continuous(breaks=seq(1990, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40), 
                      breaks=seq(0, 40, by=10)) +

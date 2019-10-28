@@ -31,7 +31,7 @@ wip <- fread(here("data", "WB-WiP.csv"),
              check.names = TRUE)
 
 
-## head -n 5 ../data/WB-WiP.csv | tail -n -1 -c 31
+## head -n 5 ../data/WB-WiP.csv | tail -c 31
 
 
 ## ----checkV64, collapse=TRUE---------------------------------------------

@@ -26,7 +26,7 @@ file.copy(here("data", WiPDataFile), here("data", "WB-WiP.csv"))
 rmarkdown::render(here("doc", "WiP-rdatatable.Rmd"))
 
 # Create an image for the README.md file
-  tempPNGs <- rep(tempfile(), 2)
+  tempPNGs <- c(tempfile(), tempfile())
   pdf_convert(here("doc", "WiP-rdatatable.pdf"), "png", pages = 1:2,
               filenames = tempPNGs)
 

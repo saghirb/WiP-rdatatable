@@ -272,7 +272,7 @@ We will start by removing columns ``r tail(names(wip), n=1)``, `Indicator.Name` 
 Column ``r tail(names(wip), n=1)`` is created automatically due to an extra comma 
 at the end of the column names (fifth) line of `WB-WiP.csv`:
 ```{bash extraComma, echo=FALSE, comment="   ..."}
-head -n 5 ../data/WB-WiP.csv | tail -n -1 -c 31
+head -n 5 ../data/WB-WiP.csv | tail -c 31
 ```
 ## Check
 

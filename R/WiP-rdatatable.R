@@ -1,4 +1,4 @@
-## ----setup, include=FALSE------------------------------------------------
+## ----setup, include=FALSE------------------
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE) #, knitr.table.format = 'latex')
 library(data.table)
 library(ggplot2)
@@ -23,7 +23,7 @@ update_geom_defaults("boxplot", list(outlier.size = 0.5))
 ## head -n 4 ../data/WB-WiP.csv | cat -n |  sed 's/^[[:blank:]]*/ /g'
 
 
-## ----readData, collapse=TRUE---------------------------------------------
+## ----readData, collapse=TRUE---------------
 library(data.table)
 library(here)
 wip <- fread(here("data", "WB-WiP.csv"), 
@@ -34,20 +34,20 @@ wip <- fread(here("data", "WB-WiP.csv"),
 ## head -n 5 ../data/WB-WiP.csv | tail -c 31
 
 
-## ----checkV64, collapse=TRUE---------------------------------------------
-wip[, .N, by=.(V64)]
+## ----checkVxxNA, collapse=TRUE-------------
+wip[, .N, by=.(V65)]
 
 
-## ----rmCols, collapse=TRUE-----------------------------------------------
+## ----rmCols, collapse=TRUE-----------------
 wip[, c("Indicator.Name", "Indicator.Code", 
-        "V64"):=NULL]
+        "V65"):=NULL]
 setnames(wip, c("Country.Name", "Country.Code"), 
               c("Country", "Code"))
 head(names(wip))
 tail(names(wip))
 
 
-## ----meltwip, collapse=TRUE, message=FALSE, warning=FALSE----------------
+## ----meltwip, collapse=TRUE, message=FALSE, warning=FALSE----
 WP <- melt(wip,
            id.vars = c("Country", "Code"),
            measure = patterns("^X"),
@@ -57,9 +57,8 @@ WP <- melt(wip,
 WP
 
 
-## ----finalTweaks, collapse=TRUE------------------------------------------
-WP[, `:=`(Year=as.numeric(gsub("[^[:digit:].]", 
-                               "",  YearC)),
+## ----finalTweaks, collapse=TRUE------------
+WP[, `:=`(Year=as.numeric(gsub("X", "",  YearC)),
           Ratio = (100-pctWiP)/pctWiP)][
             , YearC:=NULL]
 setcolorder(WP, c("Country", "Code", "Year", 
@@ -68,11 +67,11 @@ setcolorder(WP, c("Country", "Code", "Year",
 WP
 
 
-## ----PTTable-------------------------------------------------------------
+## ----PTTable-------------------------------
 WP[Country %in% "Portugal"]
 
 
-## ----PTplot, fig.width=3, fig.height=2.3---------------------------------
+## ----PTplot, fig.width=3, fig.height=2.3----
 library(ggplot2)
 library(magrittr)
 WP[Country %in% "Portugal"] %>% 
@@ -82,7 +81,7 @@ ggplot(aes(Year, pctWiP)) +
   ylab("% Women in Parliament")
 
 
-## ----euPctPlot, fig.width=3.5, fig.height=2.9, cache=FALSE---------------
+## ----euPctPlot, fig.width=3.5, fig.height=2.9, cache=FALSE----
 WP[Country %in% c("Portugal", "Sweden", "Spain",
      "Hungary", "Romania", "Finland", "Germany",
                            "European Union")] %>%
@@ -96,25 +95,25 @@ WP[Country %in% c("Portugal", "Sweden", "Spain",
   ylab("% Women in Parliament")
 
 
-## ----allTopPct-----------------------------------------------------------
+## ----allTopPct-----------------------------
 WP[order(-pctWiP), head(.SD, 10)]
 
 
-## ----allTopPctYear, collapse=TRUE----------------------------------------
+## ----allTopPctYear, collapse=TRUE----------
 WP[order(Year, -pctWiP), head(.SD, 1), by = Year]
 
 
-## ----mergeContinent------------------------------------------------------
+## ----mergeContinent------------------------
 # Ensure that 'countrycode' package is installed.
 # install.packages("countrycode")
 library(countrycode)
 cl <- as.data.table(codelist)[, .(continent, wb)]
-setnames(cl, c("continent", "wb"), 
-             c("Continent", "Code"))
-cWP <- cl[WP, on="Code"]
+setnames(cl, c("continent"), c("Continent"))
+cWP <- merge(WP, cl, by.x = "Code", by.y = "wb",
+             all.x = TRUE)
 
 
-## ----allTopPctYearContinent, collapse=TRUE-------------------------------
+## ----allTopPctYearContinent, collapse=TRUE----
 cWP[Year %in% c(1990, 2018) & !is.na(Continent)][
     order(Year, -pctWiP), head(.SD, 1), 
     by = .(Year, Continent)][
@@ -122,7 +121,7 @@ cWP[Year %in% c(1990, 2018) & !is.na(Continent)][
     .(Continent, Year, Country, pctWiP)]
 
 
-## ----declinePct, collapse=TRUE-------------------------------------------
+## ----declinePct, collapse=TRUE-------------
 dWP <- cWP[
   order(Country, Year), .SD[c(1,.N)], 
    by=Country][,
@@ -133,7 +132,7 @@ dWP[!is.na(Continent),
     .(Country, pctWiP, pctDiff)]
 
 
-## ----decline5pct, fig.width=3.5, fig.height=2.5--------------------------
+## ----decline5pct, fig.width=3.5, fig.height=2.5----
 # Select the countries to plot
 dclpct <- unique(dWP[!is.na(Continent) &
                    pctDiff <= -5]$Country)
@@ -149,31 +148,31 @@ WP[Country %in% dclpct] %>%
   ylab("% Women in Parliament")
 
 
-## ----globalRank , collapse=TRUE------------------------------------------
+## ----globalRank , collapse=TRUE------------
 cWP[!is.na(Continent), 
     `:=`(RankG = rank(-pctWiP), TotalG = .N),
         by = .(Year)]
 
 
-## ----globalRankPT , collapse=TRUE----------------------------------------
+## ----globalRankPT , collapse=TRUE----------
 cWP[Country=="Portugal", 
   .(Country, Year, pctWiP, Ratio, RankG, TotalG)][
   order(Year)]
 
 
-## ----continentRank , collapse=TRUE---------------------------------------
+## ----continentRank , collapse=TRUE---------
 cWP[!is.na(Continent), 
     `:=`(RankC = rank(-pctWiP), TotalC = .N),
         by = .(Continent, Year)]
 
 
-## ----continentRankPT , collapse=TRUE-------------------------------------
+## ----continentRankPT , collapse=TRUE-------
 cWP[Country=="Portugal", 
   .(Country, Year, pctWiP, Ratio, RankC, TotalC)][
   order(Year)]
 
 
-## ----euRankplot, fig.width=3.5, fig.height=2.7---------------------------
+## ----euRankplot, fig.width=3.5, fig.height=2.7----
 cWP[Country %in% c("Portugal", "Sweden", "Spain",
   "Hungary", "Romania", "Finland", "Germany")] %>%
   ggplot(aes(Year, RankC, colour=Country)) +
@@ -186,7 +185,7 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
   ylab("Rank in Europe")
 
 
-## ----allTopRankYearContinent, collapse=TRUE, echo=2----------------------
+## ----allTopRankYearContinent, collapse=TRUE, echo=2----
 options(datatable.print.rownames=FALSE)
 cWP[Year %in% c(1990, 2018) & RankC==1][
     order(Continent, Year), 
@@ -194,13 +193,14 @@ cWP[Year %in% c(1990, 2018) & RankC==1][
 options(datatable.print.rownames=TRUE)
 
 
-## ----globalTrends, warning=FALSE, message=FALSE, fig.width=3, fig.height=2.5----
+## ----globalTrends, message=FALSE, fig.width=3, fig.height=2.5----
 library(gghighlight)
 cWP[is.na(Continent)] %>%
   ggplot(aes(Year, pctWiP, group=Country)) +
   geom_line() +
   gghighlight(Country=="World", 
-              use_direct_label = FALSE) +
+              use_direct_label = FALSE, 
+              use_group_by = FALSE) +
   scale_x_continuous(breaks=seq(1990, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40), 
                      breaks=seq(0, 40, by=10)) +
@@ -208,6 +208,6 @@ cWP[is.na(Continent)] %>%
   ylab("% Women in Parliament")
 
 
-## ----addWiPrect, echo=FALSE, out.width="100%"----------------------------
+## ----addWiPrect, echo=FALSE, out.width="100%"----
 include_graphics(here("images", "Women_in_Parliament_rect.png"))
 

@@ -277,8 +277,8 @@ head -n 5 ../data/WB-WiP.csv | tail -c 31
 ## Check
 
 Before removing it check that all values are `NA`.
-```{r checkV64, collapse=TRUE}
-wip[, .N, by=.(V64)]
+```{r checkVxxNA, collapse=TRUE}
+wip[, .N, by=.(V65)]
 ```
 Column `Indicator.Name` has the unique value _"`r unique(wip[, .(Indicator.Name)])`"_ 
 and in `Indicator.Code` it is _"`r unique(wip[, .(Indicator.Code)])`"_. 
@@ -295,7 +295,7 @@ The indicator and ``r tail(names(wip), n=1)`` columns can be removed. We will al
 rename "`Country.Name`" as "`Country`" and "`Country.Code`" as "`Code`".
 ```{r rmCols, collapse=TRUE}
 wip[, c("Indicator.Name", "Indicator.Code", 
-        "V64"):=NULL]
+        "V65"):=NULL]
 setnames(wip, c("Country.Name", "Country.Code"), 
               c("Country", "Code"))
 head(names(wip))
@@ -321,8 +321,7 @@ WP
 
 Create a numeric `Year` variable and a `Ratio` of men to women in parliament.
 ```{r finalTweaks, collapse=TRUE}
-WP[, `:=`(Year=as.numeric(gsub("[^[:digit:].]", 
-                               "",  YearC)),
+WP[, `:=`(Year=as.numeric(gsub("X", "",  YearC)),
           Ratio = (100-pctWiP)/pctWiP)][
             , YearC:=NULL]
 setcolorder(WP, c("Country", "Code", "Year", 
@@ -468,9 +467,9 @@ available, we can merge the "`continent`" from the "`codelist`" dataset in the
 # install.packages("countrycode")
 library(countrycode)
 cl <- as.data.table(codelist)[, .(continent, wb)]
-setnames(cl, c("continent", "wb"), 
-             c("Continent", "Code"))
-cWP <- cl[WP, on="Code"]
+setnames(cl, c("continent"), c("Continent"))
+cWP <- merge(WP, cl, by.x = "Code", by.y = "wb",
+             all.x = TRUE)
 ```
 
 ## Highest percentages by year and continent
@@ -636,7 +635,8 @@ cWP[is.na(Continent)] %>%
   ggplot(aes(Year, pctWiP, group=Country)) +
   geom_line() +
   gghighlight(Country=="World", 
-              use_direct_label = FALSE, use_group_by = FALSE) +
+              use_direct_label = FALSE, 
+              use_group_by = FALSE) +
   scale_x_continuous(breaks=seq(1990, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40), 
                      breaks=seq(0, 40, by=10)) +

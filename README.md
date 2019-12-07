@@ -24,7 +24,6 @@ You should be familiar with the `data.table` and `ggplot2` R packages.
 - [Getting Started in R - Tinyverse Edition](https://github.com/eddelbuettel/gsir-te)
 - [ggplot2](https://ggplot2.tidyverse.org/)
 
-
 ## Cross References
 
 There is also a **tidyverse version** of this guide and repository available at:
@@ -42,8 +41,14 @@ A reminder of source annoucements.
 * https://twitter.com/ilustat/status/1106268429047205889
 * https://rweekly.org/2019-12.html#Highlight 
 * https://rweekly.org/2019-12.html#RintheRealWorld
+* https://twitter.com/ilustat/status/1203321868972896257 (20191207)
 
+### Images
 
+The "Women in Parliament" hex sticker and image are taken from the following repository:
+
+* https://github.com/saghirb/Women-in-Parliament-Hex-Sticker
+  
 ## Acknowledgements
 
 Thanks to [Matt Dowle](https://github.com/mattdowle), [Arun Srinivasan](https://github.com/arunsrinivasan) and all the `data.table` [team](https://github.com/orgs/Rdatatable/people) and contributors for such a great package.

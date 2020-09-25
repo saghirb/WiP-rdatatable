@@ -1,5 +1,5 @@
 ## ----setup, include=FALSE------------------
-knitr::opts_chunk$set(echo = TRUE, eval = TRUE) #, knitr.table.format = 'latex')
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, message = TRUE, collapse = TRUE)
 library(data.table)
 library(ggplot2)
 library(knitr)
@@ -63,8 +63,9 @@ WP[, `:=`(Year=as.numeric(gsub("X", "",  YearC)),
             , YearC:=NULL]
 setcolorder(WP, c("Country", "Code", "Year", 
                   "pctWiP", "Ratio"))
-# Look at the contents of WP
-WP
+# Look at the contents of WP 
+# Note: Dropped Country name due to space
+WP[, .(Code, Year, pctWiP, Ratio)]
 
 
 ## ----PTTable-------------------------------
@@ -88,7 +89,7 @@ WP[Country %in% c("Portugal", "Sweden", "Spain",
   ggplot(aes(Year, pctWiP, colour=Country)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 50), 
                      breaks=seq(0, 50, by=10)) +
   ggtitle("Women in Parliament: EU Countries") +
@@ -113,17 +114,18 @@ cWP <- merge(WP, cl, by.x = "Code", by.y = "wb",
              all.x = TRUE)
 
 
-## ----allTopPctYearContinent, collapse=TRUE----
-cWP[Year %in% c(1990, 2018) & !is.na(Continent)][
+## ----allTopPctYearContinent, collapse=TRUE, echo=2----
+options(datatable.print.rownames=FALSE)
+cWP[Year %in% c(1997, 2019) & !is.na(Continent)][
     order(Year, -pctWiP), head(.SD, 1), 
     by = .(Year, Continent)][
     order(Continent, Year), 
     .(Continent, Year, Country, pctWiP)]
+options(datatable.print.rownames=TRUE)
 
 
 ## ----declinePct, collapse=TRUE-------------
-dWP <- cWP[
-  order(Country, Year), .SD[c(1,.N)], 
+dWP <- cWP[order(Country, Year), .SD[c(1,.N)], 
    by=Country][,
   pctDiff := pctWiP - shift(pctWiP), by=Country][
   pctDiff<0][
@@ -141,7 +143,7 @@ WP[Country %in% dclpct] %>%
   ggplot(aes(Year, pctWiP, colour=Country)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40),
   breaks=seq(0, 40, by=10)) +
   ggtitle("Women in Parliament: Decline >=5%") +
@@ -178,7 +180,7 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
   ggplot(aes(Year, RankC, colour=Country)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 45), 
                      breaks=seq(0, 45, by=10)) +
   ggtitle("Women in Parliament: Ranked") +
@@ -187,9 +189,9 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
 
 ## ----allTopRankYearContinent, collapse=TRUE, echo=2----
 options(datatable.print.rownames=FALSE)
-cWP[Year %in% c(1990, 2018) & RankC==1][
+cWP[Year %in% c(1997, 2019) & RankC==1][
     order(Continent, Year), 
-      .(Continent, Year, Country, pctWiP, RankC)]
+      .(Continent, Year, Country, pctWiP)]
 options(datatable.print.rownames=TRUE)
 
 
@@ -201,7 +203,7 @@ cWP[is.na(Continent)] %>%
   gghighlight(Country=="World", 
               use_direct_label = FALSE, 
               use_group_by = FALSE) +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40), 
                      breaks=seq(0, 40, by=10)) +
   ggtitle("Women in Parliament: Global Trends") +

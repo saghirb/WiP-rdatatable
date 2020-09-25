@@ -93,7 +93,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval = TRUE) #, knitr.table.format = 'latex')
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, message = TRUE, collapse = TRUE)
 library(data.table)
 library(ggplot2)
 library(knitr)
@@ -326,8 +326,9 @@ WP[, `:=`(Year=as.numeric(gsub("X", "",  YearC)),
             , YearC:=NULL]
 setcolorder(WP, c("Country", "Code", "Year", 
                   "pctWiP", "Ratio"))
-# Look at the contents of WP
-WP
+# Look at the contents of WP 
+# Note: Dropped Country name due to space
+WP[, .(Code, Year, pctWiP, Ratio)]
 ```
 
 # Questions
@@ -378,8 +379,8 @@ ggplot(aes(Year, pctWiP)) +
 
 ### Interpretation
 
-In 1990 Portugal had 7.6% women in parliament (i.e. 12.2 men for each woman), which 
-increased to 34.8% (i.e. 1.87 men for each woman) in 2018. This still falls short 
+In 1997 Portugal had 13.0% women in parliament (i.e. 12.2 men for each woman), which 
+increased to 38.7% (i.e. 1.58 men for each woman) in 2019. This still falls short 
 of 50% (i.e. point of gender parity in parliament).
 
 ## Exercise 
@@ -398,7 +399,7 @@ WP[Country %in% c("Portugal", "Sweden", "Spain",
   ggplot(aes(Year, pctWiP, colour=Country)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 50), 
                      breaks=seq(0, 50, by=10)) +
   ggtitle("Women in Parliament: EU Countries") +
@@ -408,10 +409,8 @@ WP[Country %in% c("Portugal", "Sweden", "Spain",
 ### Interpretation
 
 Since 2007 Portugal has had more women in parliament than the European Union average. 
-Hungary and Romania both had a higher percentage of women in parliament in 1990 
-(around the end of the Cold War) than they have had since. The key point to note 
-is that none of these countries reaches equality between males and females in 
-parliament, although Sweden and Finland come closest.
+The key point to note is that none of these countries reaches equality between males 
+and females in parliament, although Sweden and Finland come closest.
 
 ## A couple of points to note
 
@@ -474,23 +473,23 @@ cWP <- merge(WP, cl, by.x = "Code", by.y = "wb",
 
 ## Highest percentages by year and continent
 
-Which countries have the highest percentages in 1990 and 2018?
-```{r allTopPctYearContinent, collapse=TRUE}
-cWP[Year %in% c(1990, 2018) & !is.na(Continent)][
+Which countries have the highest percentages in 1997 and 2019?
+```{r allTopPctYearContinent, collapse=TRUE, echo=2}
+options(datatable.print.rownames=FALSE)
+cWP[Year %in% c(1997, 2019) & !is.na(Continent)][
     order(Year, -pctWiP), head(.SD, 1), 
     by = .(Year, Continent)][
     order(Continent, Year), 
     .(Continent, Year, Country, pctWiP)]
+options(datatable.print.rownames=TRUE)
 ```
 
 ## Decline in percentage
 
-Which countries have had a decline in percentage since their first measurement
-(not always 1990)?
+Which countries have had a decline in percentage of women in parliament since their first and last available measurement?
 
 ```{r declinePct, collapse=TRUE}
-dWP <- cWP[
-  order(Country, Year), .SD[c(1,.N)], 
+dWP <- cWP[order(Country, Year), .SD[c(1,.N)], 
    by=Country][,
   pctDiff := pctWiP - shift(pctWiP), by=Country][
   pctDiff<0][
@@ -513,7 +512,7 @@ WP[Country %in% dclpct] %>%
   ggplot(aes(Year, pctWiP, colour=Country)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40),
   breaks=seq(0, 40, by=10)) +
   ggtitle("Women in Parliament: Decline >=5%") +
@@ -522,8 +521,8 @@ WP[Country %in% dclpct] %>%
 
 ### Interpretation
 
-There is a consistent decline between 1990 and 1997 that should be investigated 
-in collaboration with a subject matter expert to understand the potential causes.
+Only Seychelles had a decline to greater than 5% which could be due a low number
+of seats in the parliament.
 
 ## Ranked status
 
@@ -592,7 +591,7 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
   ggplot(aes(Year, RankC, colour=Country)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 45), 
                      breaks=seq(0, 45, by=10)) +
   ggtitle("Women in Parliament: Ranked") +
@@ -601,9 +600,8 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
 
 ### Interpretation
 
-A total of `r nrow(cWP[Continent=="Europe" & Year==1990])` European countries had
-data in 1990, `r nrow(cWP[Continent=="Europe" & Year==1997])` in 1997 and 
-`r nrow(cWP[Continent=="Europe" & Year==2018])` in 2018. Within Europe, Portugal 
+A total of `r nrow(cWP[Continent=="Europe" & Year==1997])` in 1997 and 
+`r nrow(cWP[Continent=="Europe" & Year==2019])` in 2019. Within Europe, Portugal 
 was typically ranked in the second quartile (25-50%) with the fluctuations of its 
 ranking most likely due to random variation.
 
@@ -613,14 +611,14 @@ How does your chosen country rank within its continent?
 
 ## Highest rank by year and continent
 
-Which countries have the highest rank in 1990 and 2018? The answer will coincide 
+Which countries have the highest rank in 1997 and 2019? The answer will coincide 
 with the highest percentages (see above).
 
 ```{r allTopRankYearContinent, collapse=TRUE, echo=2}
 options(datatable.print.rownames=FALSE)
-cWP[Year %in% c(1990, 2018) & RankC==1][
+cWP[Year %in% c(1997, 2019) & RankC==1][
     order(Continent, Year), 
-      .(Continent, Year, Country, pctWiP, RankC)]
+      .(Continent, Year, Country, pctWiP)]
 options(datatable.print.rownames=TRUE)
 ```
 
@@ -637,7 +635,7 @@ cWP[is.na(Continent)] %>%
   gghighlight(Country=="World", 
               use_direct_label = FALSE, 
               use_group_by = FALSE) +
-  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
   scale_y_continuous(limits=c(0, 40), 
                      breaks=seq(0, 40, by=10)) +
   ggtitle("Women in Parliament: Global Trends") +
@@ -647,7 +645,7 @@ cWP[is.na(Continent)] %>%
 ### Interpretation
 
 The grey lines show that regardless of how we define region the general trends
-are upwards. The "World" percentage (black line) increased between 1997 and 2018. 
+are upwards. The "World" percentage (black line) increased between 1997 and 2019. 
 In 2018, women in parliament represented 24% (i.e. a ratio of 3.17 men to each woman), 
 which is still less than half the level before gender parity can be claimed.
 

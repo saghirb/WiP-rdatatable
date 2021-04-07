@@ -5,7 +5,7 @@
 %%   as well as local changes 
 %%
 %% Dirk Eddelbuettel and James Balamuta 
-%% August - September 2017, September 2019
+%% August - September 2017, September 2019, September 2020
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % pnas-new.cls, v1.44, 2018/05/06
@@ -213,7 +213,25 @@
     }{}
   }
 \fi
-  
+
+%% Multi-column mode using pandoc's '::::::' blocks with ':::'
+%%
+%% The code snippet is borrowed with love from Grant McDermott's repo at
+%% https://github.com/grantmcdermott/two-col-test and slightly extended to
+%% fit 'flushed' without indentation, removing a makeatletter layer
+\newenvironment{columns}[1][]{}{}
+\newenvironment{column}[1]{\noindent\begin{minipage}[t]{#1}\ignorespaces}{%
+  \end{minipage}
+  \ifhmode\unskip\fi
+  \aftergroup\useignorespacesandallpars}
+\def\useignorespacesandallpars#1\ignorespaces\fi{%
+  #1\fi\ignorespacesandallpars}
+\def\ignorespacesandallpars{%
+  \@ifnextchar\par
+  {\expandafter\ignorespacesandallpars\@gobble}%
+  {}%
+}
+
 %% Copyright statement (not used)
 \newboolean{displaycopyright}
 \setboolean{displaycopyright}{false} % Confirmed as not required
@@ -317,7 +335,7 @@
 
 \makeatletter
 \fancypagestyle{firststyle}{
-   \fancyfoot[R]{\footerfont \printpinpfootercontents\hspace{7pt}|\hspace{7pt}\textbf{\today}\hspace{7pt}|\hspace{7pt}\textbf{\thepage\textendash\pageref{LastPage}}}
+   \fancyfoot[R]{\footerfont \printpinpfootercontents\hspace{7pt}|\hspace{7pt}\textbf{\@ifundefined{@documentdate}{\today}{\@documentdate}}\hspace{7pt}|\hspace{7pt}\textbf{\thepage\textendash\pageref{LastPage}}}
    \fancyfoot[L]{\footerfont\@ifundefined{@doifooter}{}{\@doifooter}}
 }
 \makeatother
@@ -331,7 +349,7 @@
 \rfoot{}%
 \makeatletter
 \fancyfoot[LE]{\footerfont\textbf{\thepage}\hspace{7pt}|\hspace{7pt}\@ifundefined{@doifooter}{}{\@doifooter}}
-\fancyfoot[RO]{\footerfont \printpinpfootercontents\hspace{7pt}|\hspace{7pt}\textbf{\today}\hspace{7pt}|\hspace{7pt}\textbf{\thepage}}
+\fancyfoot[RO]{\footerfont \printpinpfootercontents\hspace{7pt}|\hspace{7pt}\textbf{\@ifundefined{@documentdate}{\today}{\@documentdate}}\hspace{7pt}|\hspace{7pt}\textbf{\thepage}}
 \fancyfoot[RE,LO]{\footerfont\@ifundefined{@leadauthor}{}{\@leadauthor}}
 
 % Use footer routine for line numbers
@@ -396,6 +414,7 @@
 \newcommand{\additionalelement}[1]{\def\@additionalelement{#1}}
 \newcommand{\dates}[1]{\def\@dates{#1}}
 \newcommand{\doifooter}[1]{\def\@doifooter{#1}}
+\newcommand{\documentdate}[1]{\def\@documentdate{#1}}
 \newcommand{\leadauthor}[1]{\def\@leadauthor{#1}}
 \newcommand{\etal}[1]{\def\@etal{#1}}
 \newcommand{\keywords}[1]{\def\@keywords{#1}}

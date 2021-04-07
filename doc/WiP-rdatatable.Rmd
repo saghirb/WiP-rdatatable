@@ -278,7 +278,7 @@ head -n 5 ../data/WB-WiP.csv | tail -c 31
 
 Before removing it check that all values are `NA`.
 ```{r checkVxxNA, collapse=TRUE}
-wip[, .N, by=.(V65)]
+wip[, .N, by=.(V66)]
 ```
 Column `Indicator.Name` has the unique value _"`r unique(wip[, .(Indicator.Name)])`"_ 
 and in `Indicator.Code` it is _"`r unique(wip[, .(Indicator.Code)])`"_. 
@@ -295,7 +295,7 @@ The indicator and ``r tail(names(wip), n=1)`` columns can be removed. We will al
 rename "`Country.Name`" as "`Country`" and "`Country.Code`" as "`Code`".
 ```{r rmCols, collapse=TRUE}
 wip[, c("Indicator.Name", "Indicator.Code", 
-        "V65"):=NULL]
+        "V66"):=NULL]
 setnames(wip, c("Country.Name", "Country.Code"), 
               c("Country", "Code"))
 head(names(wip))
@@ -380,7 +380,7 @@ ggplot(aes(Year, pctWiP)) +
 ### Interpretation
 
 In 1997 Portugal had 13.0% women in parliament (i.e. 12.2 men for each woman), which 
-increased to 38.7% (i.e. 1.58 men for each woman) in 2019. This still falls short 
+increased to 38.7% (i.e. 1.58 men for each woman) in 2020. This still falls short 
 of 50% (i.e. point of gender parity in parliament).
 
 ## Exercise 
@@ -473,10 +473,10 @@ cWP <- merge(WP, cl, by.x = "Code", by.y = "wb",
 
 ## Highest percentages by year and continent
 
-Which countries have the highest percentages in 1997 and 2019?
+Which countries have the highest percentages in 1997 and 2020?
 ```{r allTopPctYearContinent, collapse=TRUE, echo=2}
 options(datatable.print.rownames=FALSE)
-cWP[Year %in% c(1997, 2019) & !is.na(Continent)][
+cWP[Year %in% c(1997, 2020) & !is.na(Continent)][
     order(Year, -pctWiP), head(.SD, 1), 
     by = .(Year, Continent)][
     order(Continent, Year), 
@@ -497,32 +497,6 @@ dWP <- cWP[order(Country, Year), .SD[c(1,.N)],
 dWP[!is.na(Continent),
     .(Country, pctWiP, pctDiff)]
 ```
-
-### Visualisation 
-
-We will plot the trend lines for countries with at least a 5% decline. Note that the
-"5%" is arbitrarily selected.
-
-```{r decline5pct, fig.width=3.5, fig.height=2.5}
-# Select the countries to plot
-dclpct <- unique(dWP[!is.na(Continent) &
-                   pctDiff <= -5]$Country)
-
-WP[Country %in% dclpct] %>%
-  ggplot(aes(Year, pctWiP, colour=Country)) +
-  geom_line() +
-  geom_point() +
-  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
-  scale_y_continuous(limits=c(0, 40),
-  breaks=seq(0, 40, by=10)) +
-  ggtitle("Women in Parliament: Decline >=5%") +
-  ylab("% Women in Parliament")
-```
-
-### Interpretation
-
-Only Seychelles had a decline to greater than 5% which could be due a low number
-of seats in the parliament.
 
 ## Ranked status
 
@@ -601,7 +575,7 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
 ### Interpretation
 
 A total of `r nrow(cWP[Continent=="Europe" & Year==1997])` in 1997 and 
-`r nrow(cWP[Continent=="Europe" & Year==2019])` in 2019. Within Europe, Portugal 
+`r nrow(cWP[Continent=="Europe" & Year==2020])` in 2020. Within Europe, Portugal 
 was typically ranked in the second quartile (25-50%) with the fluctuations of its 
 ranking most likely due to random variation.
 
@@ -611,12 +585,12 @@ How does your chosen country rank within its continent?
 
 ## Highest rank by year and continent
 
-Which countries have the highest rank in 1997 and 2019? The answer will coincide 
+Which countries have the highest rank in 1997 and 2020? The answer will coincide 
 with the highest percentages (see above).
 
 ```{r allTopRankYearContinent, collapse=TRUE, echo=2}
 options(datatable.print.rownames=FALSE)
-cWP[Year %in% c(1997, 2019) & RankC==1][
+cWP[Year %in% c(1997, 2020) & RankC==1][
     order(Continent, Year), 
       .(Continent, Year, Country, pctWiP)]
 options(datatable.print.rownames=TRUE)
@@ -645,7 +619,7 @@ cWP[is.na(Continent)] %>%
 ### Interpretation
 
 The grey lines show that regardless of how we define region the general trends
-are upwards. The "World" percentage (black line) increased between 1997 and 2019. 
+are upwards. The "World" percentage (black line) increased between 1997 and 2020. 
 In 2018, women in parliament represented 24% (i.e. a ratio of 3.17 men to each woman), 
 which is still less than half the level before gender parity can be claimed.
 

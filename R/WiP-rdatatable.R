@@ -35,12 +35,12 @@ wip <- fread(here("data", "WB-WiP.csv"),
 
 
 ## ----checkVxxNA, collapse=TRUE-------------
-wip[, .N, by=.(V65)]
+wip[, .N, by=.(V66)]
 
 
 ## ----rmCols, collapse=TRUE-----------------
 wip[, c("Indicator.Name", "Indicator.Code", 
-        "V65"):=NULL]
+        "V66"):=NULL]
 setnames(wip, c("Country.Name", "Country.Code"), 
               c("Country", "Code"))
 head(names(wip))
@@ -116,7 +116,7 @@ cWP <- merge(WP, cl, by.x = "Code", by.y = "wb",
 
 ## ----allTopPctYearContinent, collapse=TRUE, echo=2----
 options(datatable.print.rownames=FALSE)
-cWP[Year %in% c(1997, 2019) & !is.na(Continent)][
+cWP[Year %in% c(1997, 2020) & !is.na(Continent)][
     order(Year, -pctWiP), head(.SD, 1), 
     by = .(Year, Continent)][
     order(Continent, Year), 
@@ -132,22 +132,6 @@ dWP <- cWP[order(Country, Year), .SD[c(1,.N)],
   order(pctDiff)]
 dWP[!is.na(Continent),
     .(Country, pctWiP, pctDiff)]
-
-
-## ----decline5pct, fig.width=3.5, fig.height=2.5----
-# Select the countries to plot
-dclpct <- unique(dWP[!is.na(Continent) &
-                   pctDiff <= -5]$Country)
-
-WP[Country %in% dclpct] %>%
-  ggplot(aes(Year, pctWiP, colour=Country)) +
-  geom_line() +
-  geom_point() +
-  scale_x_continuous(breaks=seq(1995, 2020, 5)) +
-  scale_y_continuous(limits=c(0, 40),
-  breaks=seq(0, 40, by=10)) +
-  ggtitle("Women in Parliament: Decline >=5%") +
-  ylab("% Women in Parliament")
 
 
 ## ----globalRank , collapse=TRUE------------
@@ -189,7 +173,7 @@ cWP[Country %in% c("Portugal", "Sweden", "Spain",
 
 ## ----allTopRankYearContinent, collapse=TRUE, echo=2----
 options(datatable.print.rownames=FALSE)
-cWP[Year %in% c(1997, 2019) & RankC==1][
+cWP[Year %in% c(1997, 2020) & RankC==1][
     order(Continent, Year), 
       .(Continent, Year, Country, pctWiP)]
 options(datatable.print.rownames=TRUE)
